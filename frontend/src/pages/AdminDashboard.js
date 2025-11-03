@@ -74,9 +74,12 @@ const AdminDashboard = ({ user, onLogout }) => {
       <header className="bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg">
         <div className="container mx-auto px-4 py-6">
           <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold">لوحة تحكم عيادات الغصاب</h1>
-              <p className="text-blue-100">مرحباً {user.name}</p>
+            <div className="flex items-center gap-4">
+              <img src="/logo.png" alt="عيادات الغصاب" className="h-12 w-auto bg-white rounded-lg p-1" />
+              <div>
+                <h1 className="text-2xl font-bold">لوحة تحكم عيادات الغصاب</h1>
+                <p className="text-blue-100">مرحباً {user.name}</p>
+              </div>
             </div>
             <div className="flex gap-3 items-center">
               <ChangePasswordDialog userId={user.id} />
