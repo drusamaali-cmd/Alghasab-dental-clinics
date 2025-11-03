@@ -1,15 +1,18 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, BackgroundTasks
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from pydantic import BaseModel, Field, ConfigDict, EmailStr
+from typing import List, Optional
 import uuid
-from datetime import datetime, timezone
-
+from datetime import datetime, timezone, timedelta
+from passlib.context import CryptContext
+import jwt
+import random
+from enum import Enum
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -25,46 +28,581 @@ app = FastAPI()
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# Password hashing
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+SECRET_KEY = os.environ.get("SECRET_KEY", "your-secret-key-change-in-production")
+ALGORITHM = "HS256"
 
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
-    
+# Enums
+class UserRole(str, Enum):
+    ADMIN = "admin"
+    PATIENT = "patient"
+
+class AppointmentStatus(str, Enum):
+    PENDING = "pending"
+    CONFIRMED = "confirmed"
+    CANCELLED = "cancelled"
+    COMPLETED = "completed"
+
+class ServiceType(str, Enum):
+    CLEANING = "تنظيف"
+    FILLING = "حشو"
+    EXTRACTION = "خلع"
+    ROOT_CANAL = "علاج عصب"
+    WHITENING = "تبييض"
+    ORTHODONTICS = "تقويم"
+    IMPLANTS = "زراعة"
+    COSMETIC = "تجميل"
+
+# Models
+class User(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    phone: str
+    name: Optional[str] = None
+    role: UserRole = UserRole.PATIENT
+    fcm_token: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+class UserCreate(BaseModel):
+    phone: str
+    name: Optional[str] = None
 
-# Add your routes to the router instead of directly to app
-@api_router.get("/")
-async def root():
-    return {"message": "Hello World"}
+class OTPVerify(BaseModel):
+    phone: str
+    otp: str
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
+class Doctor(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    specialization: str
+    phone: Optional[str] = None
+    available_days: List[str] = []
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
+class DoctorCreate(BaseModel):
+    name: str
+    specialization: str
+    phone: Optional[str] = None
+    available_days: List[str] = []
+
+class Service(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    name_en: str
+    description: Optional[str] = None
+    duration_minutes: int = 30
+    price: Optional[float] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ServiceCreate(BaseModel):
+    name: str
+    name_en: str
+    description: Optional[str] = None
+    duration_minutes: int = 30
+    price: Optional[float] = None
+
+class Appointment(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    patient_id: str
+    patient_name: str
+    patient_phone: str
+    doctor_id: str
+    doctor_name: str
+    service_id: str
+    service_name: str
+    appointment_date: datetime
+    status: AppointmentStatus = AppointmentStatus.PENDING
+    notes: Optional[str] = None
+    reminder_24h_sent: bool = False
+    reminder_3h_sent: bool = False
+    post_visit_sent: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str = "patient"  # patient or admin
+
+class AppointmentCreate(BaseModel):
+    patient_id: Optional[str] = None
+    patient_name: str
+    patient_phone: str
+    doctor_id: str
+    service_id: str
+    appointment_date: datetime
+    notes: Optional[str] = None
+    created_by: str = "patient"
+
+class AppointmentUpdate(BaseModel):
+    doctor_id: Optional[str] = None
+    service_id: Optional[str] = None
+    appointment_date: Optional[datetime] = None
+    status: Optional[AppointmentStatus] = None
+    notes: Optional[str] = None
+
+class Campaign(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    message: str
+    target_audience: str  # all, service_type, last_visit_date, etc.
+    target_filter: Optional[dict] = None
+    sent_count: int = 0
+    opened_count: int = 0
+    booked_count: int = 0
+    status: str = "draft"  # draft, sent, scheduled
+    scheduled_for: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str
+
+class CampaignCreate(BaseModel):
+    title: str
+    message: str
+    target_audience: str
+    target_filter: Optional[dict] = None
+    scheduled_for: Optional[datetime] = None
+
+class Notification(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    title: str
+    message: str
+    type: str  # reminder, campaign, post_visit, general
+    appointment_id: Optional[str] = None
+    read: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class NotificationCreate(BaseModel):
+    user_id: str
+    title: str
+    message: str
+    type: str
+    appointment_id: Optional[str] = None
+
+class Review(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    appointment_id: str
+    patient_id: str
+    rating: int  # 1-5
+    comment: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ReviewCreate(BaseModel):
+    appointment_id: str
+    patient_id: str
+    rating: int
+    comment: Optional[str] = None
+
+class Stats(BaseModel):
+    total_appointments: int
+    pending_appointments: int
+    confirmed_appointments: int
+    completed_appointments: int
+    cancelled_appointments: int
+    total_patients: int
+    total_doctors: int
+    avg_rating: float
+
+# Helper functions
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(days=30)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+def generate_otp():
+    return str(random.randint(100000, 999999))
+
+async def send_notification(user_id: str, title: str, message: str, notification_type: str, appointment_id: Optional[str] = None):
+    """Send notification to user and store in database"""
+    notification = Notification(
+        user_id=user_id,
+        title=title,
+        message=message,
+        type=notification_type,
+        appointment_id=appointment_id
+    )
+    doc = notification.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.notifications.insert_one(doc)
+    # TODO: Integrate with Firebase Cloud Messaging
+    return notification
+
+# Auth Routes
+@api_router.post("/auth/send-otp")
+async def send_otp(user_data: UserCreate):
+    """Send OTP to phone number"""
+    otp = generate_otp()
+    # Store OTP in database with expiry
+    otp_data = {
+        "phone": user_data.phone,
+        "otp": otp,
+        "expires_at": (datetime.now(timezone.utc) + timedelta(minutes=5)).isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.otps.delete_many({"phone": user_data.phone})  # Delete old OTPs
+    await db.otps.insert_one(otp_data)
     
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
+    # TODO: Integrate with SMS provider
+    # For now, return OTP in response (only for development)
+    return {"message": "OTP sent successfully", "otp": otp, "phone": user_data.phone}
+
+@api_router.post("/auth/verify-otp")
+async def verify_otp(verify_data: OTPVerify):
+    """Verify OTP and create/login user"""
+    # Check OTP
+    otp_record = await db.otps.find_one({"phone": verify_data.phone, "otp": verify_data.otp})
+    if not otp_record:
+        raise HTTPException(status_code=400, detail="Invalid OTP")
     
-    return status_checks
+    # Check expiry
+    expires_at = datetime.fromisoformat(otp_record['expires_at'])
+    if datetime.now(timezone.utc) > expires_at:
+        raise HTTPException(status_code=400, detail="OTP expired")
+    
+    # Delete used OTP
+    await db.otps.delete_one({"phone": verify_data.phone})
+    
+    # Find or create user
+    user_doc = await db.users.find_one({"phone": verify_data.phone}, {"_id": 0})
+    if user_doc:
+        if isinstance(user_doc['created_at'], str):
+            user_doc['created_at'] = datetime.fromisoformat(user_doc['created_at'])
+        user = User(**user_doc)
+    else:
+        user = User(phone=verify_data.phone, role=UserRole.PATIENT)
+        doc = user.model_dump()
+        doc['created_at'] = doc['created_at'].isoformat()
+        await db.users.insert_one(doc)
+    
+    # Create token
+    token = create_access_token({"user_id": user.id, "phone": user.phone, "role": user.role})
+    
+    return {"token": token, "user": user}
+
+# User Routes
+@api_router.get("/users/me")
+async def get_current_user(token: str):
+    """Get current user info"""
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("user_id")
+        user_doc = await db.users.find_one({"id": user_id}, {"_id": 0})
+        if not user_doc:
+            raise HTTPException(status_code=404, detail="User not found")
+        if isinstance(user_doc['created_at'], str):
+            user_doc['created_at'] = datetime.fromisoformat(user_doc['created_at'])
+        return User(**user_doc)
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+@api_router.put("/users/me")
+async def update_user(token: str, name: Optional[str] = None, fcm_token: Optional[str] = None):
+    """Update user profile"""
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("user_id")
+        update_data = {}
+        if name:
+            update_data["name"] = name
+        if fcm_token:
+            update_data["fcm_token"] = fcm_token
+        
+        if update_data:
+            await db.users.update_one({"id": user_id}, {"$set": update_data})
+        
+        user_doc = await db.users.find_one({"id": user_id}, {"_id": 0})
+        if isinstance(user_doc['created_at'], str):
+            user_doc['created_at'] = datetime.fromisoformat(user_doc['created_at'])
+        return User(**user_doc)
+    except jwt.JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+# Doctor Routes
+@api_router.post("/doctors", response_model=Doctor)
+async def create_doctor(doctor: DoctorCreate):
+    doctor_obj = Doctor(**doctor.model_dump())
+    doc = doctor_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.doctors.insert_one(doc)
+    return doctor_obj
+
+@api_router.get("/doctors", response_model=List[Doctor])
+async def get_doctors():
+    doctors = await db.doctors.find({}, {"_id": 0}).to_list(1000)
+    for doctor in doctors:
+        if isinstance(doctor['created_at'], str):
+            doctor['created_at'] = datetime.fromisoformat(doctor['created_at'])
+    return doctors
+
+@api_router.get("/doctors/{doctor_id}", response_model=Doctor)
+async def get_doctor(doctor_id: str):
+    doctor = await db.doctors.find_one({"id": doctor_id}, {"_id": 0})
+    if not doctor:
+        raise HTTPException(status_code=404, detail="Doctor not found")
+    if isinstance(doctor['created_at'], str):
+        doctor['created_at'] = datetime.fromisoformat(doctor['created_at'])
+    return Doctor(**doctor)
+
+@api_router.delete("/doctors/{doctor_id}")
+async def delete_doctor(doctor_id: str):
+    result = await db.doctors.delete_one({"id": doctor_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Doctor not found")
+    return {"message": "Doctor deleted successfully"}
+
+# Service Routes
+@api_router.post("/services", response_model=Service)
+async def create_service(service: ServiceCreate):
+    service_obj = Service(**service.model_dump())
+    doc = service_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.services.insert_one(doc)
+    return service_obj
+
+@api_router.get("/services", response_model=List[Service])
+async def get_services():
+    services = await db.services.find({}, {"_id": 0}).to_list(1000)
+    for service in services:
+        if isinstance(service['created_at'], str):
+            service['created_at'] = datetime.fromisoformat(service['created_at'])
+    return services
+
+@api_router.delete("/services/{service_id}")
+async def delete_service(service_id: str):
+    result = await db.services.delete_one({"id": service_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Service not found")
+    return {"message": "Service deleted successfully"}
+
+# Appointment Routes
+@api_router.post("/appointments", response_model=Appointment)
+async def create_appointment(appointment: AppointmentCreate):
+    # Get doctor and service info
+    doctor = await db.doctors.find_one({"id": appointment.doctor_id}, {"_id": 0})
+    if not doctor:
+        raise HTTPException(status_code=404, detail="Doctor not found")
+    
+    service = await db.services.find_one({"id": appointment.service_id}, {"_id": 0})
+    if not service:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    appointment_obj = Appointment(
+        patient_id=appointment.patient_id or "",
+        patient_name=appointment.patient_name,
+        patient_phone=appointment.patient_phone,
+        doctor_id=appointment.doctor_id,
+        doctor_name=doctor['name'],
+        service_id=appointment.service_id,
+        service_name=service['name'],
+        appointment_date=appointment.appointment_date,
+        notes=appointment.notes,
+        created_by=appointment.created_by
+    )
+    
+    doc = appointment_obj.model_dump()
+    doc['appointment_date'] = doc['appointment_date'].isoformat()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.appointments.insert_one(doc)
+    
+    return appointment_obj
+
+@api_router.get("/appointments", response_model=List[Appointment])
+async def get_appointments(status: Optional[str] = None, patient_id: Optional[str] = None):
+    query = {}
+    if status:
+        query["status"] = status
+    if patient_id:
+        query["patient_id"] = patient_id
+    
+    appointments = await db.appointments.find(query, {"_id": 0}).to_list(1000)
+    for apt in appointments:
+        if isinstance(apt['appointment_date'], str):
+            apt['appointment_date'] = datetime.fromisoformat(apt['appointment_date'])
+        if isinstance(apt['created_at'], str):
+            apt['created_at'] = datetime.fromisoformat(apt['created_at'])
+    return appointments
+
+@api_router.get("/appointments/{appointment_id}", response_model=Appointment)
+async def get_appointment(appointment_id: str):
+    apt = await db.appointments.find_one({"id": appointment_id}, {"_id": 0})
+    if not apt:
+        raise HTTPException(status_code=404, detail="Appointment not found")
+    if isinstance(apt['appointment_date'], str):
+        apt['appointment_date'] = datetime.fromisoformat(apt['appointment_date'])
+    if isinstance(apt['created_at'], str):
+        apt['created_at'] = datetime.fromisoformat(apt['created_at'])
+    return Appointment(**apt)
+
+@api_router.put("/appointments/{appointment_id}", response_model=Appointment)
+async def update_appointment(appointment_id: str, update: AppointmentUpdate):
+    apt = await db.appointments.find_one({"id": appointment_id}, {"_id": 0})
+    if not apt:
+        raise HTTPException(status_code=404, detail="Appointment not found")
+    
+    update_data = {k: v for k, v in update.model_dump().items() if v is not None}
+    
+    # Update doctor/service names if IDs changed
+    if "doctor_id" in update_data:
+        doctor = await db.doctors.find_one({"id": update_data["doctor_id"]}, {"_id": 0})
+        if doctor:
+            update_data["doctor_name"] = doctor['name']
+    
+    if "service_id" in update_data:
+        service = await db.services.find_one({"id": update_data["service_id"]}, {"_id": 0})
+        if service:
+            update_data["service_name"] = service['name']
+    
+    if "appointment_date" in update_data:
+        update_data["appointment_date"] = update_data["appointment_date"].isoformat()
+    
+    if update_data:
+        await db.appointments.update_one({"id": appointment_id}, {"$set": update_data})
+    
+    apt = await db.appointments.find_one({"id": appointment_id}, {"_id": 0})
+    if isinstance(apt['appointment_date'], str):
+        apt['appointment_date'] = datetime.fromisoformat(apt['appointment_date'])
+    if isinstance(apt['created_at'], str):
+        apt['created_at'] = datetime.fromisoformat(apt['created_at'])
+    
+    # Send notification if status changed to confirmed
+    if update.status == AppointmentStatus.CONFIRMED:
+        if apt.get('patient_id'):
+            await send_notification(
+                apt['patient_id'],
+                "تم تأكيد موعدك",
+                f"تم تأكيد موعدك مع د. {apt['doctor_name']} في {apt['appointment_date']}",
+                "reminder",
+                appointment_id
+            )
+    
+    return Appointment(**apt)
+
+@api_router.delete("/appointments/{appointment_id}")
+async def delete_appointment(appointment_id: str):
+    result = await db.appointments.delete_one({"id": appointment_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Appointment not found")
+    return {"message": "Appointment deleted successfully"}
+
+# Campaign Routes
+@api_router.post("/campaigns", response_model=Campaign)
+async def create_campaign(campaign: CampaignCreate, created_by: str = "admin"):
+    campaign_obj = Campaign(**campaign.model_dump(), created_by=created_by)
+    doc = campaign_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    if doc.get('scheduled_for'):
+        doc['scheduled_for'] = doc['scheduled_for'].isoformat()
+    await db.campaigns.insert_one(doc)
+    return campaign_obj
+
+@api_router.get("/campaigns", response_model=List[Campaign])
+async def get_campaigns():
+    campaigns = await db.campaigns.find({}, {"_id": 0}).to_list(1000)
+    for camp in campaigns:
+        if isinstance(camp['created_at'], str):
+            camp['created_at'] = datetime.fromisoformat(camp['created_at'])
+        if camp.get('scheduled_for') and isinstance(camp['scheduled_for'], str):
+            camp['scheduled_for'] = datetime.fromisoformat(camp['scheduled_for'])
+    return campaigns
+
+@api_router.post("/campaigns/{campaign_id}/send")
+async def send_campaign(campaign_id: str, background_tasks: BackgroundTasks):
+    campaign = await db.campaigns.find_one({"id": campaign_id}, {"_id": 0})
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+    
+    # Get target users
+    query = {"role": "patient"}
+    if campaign.get('target_filter'):
+        # Apply filters (simplified for now)
+        pass
+    
+    users = await db.users.find(query, {"_id": 0}).to_list(10000)
+    
+    # Send notifications to all users
+    sent_count = 0
+    for user in users:
+        await send_notification(
+            user['id'],
+            campaign['title'],
+            campaign['message'],
+            "campaign"
+        )
+        sent_count += 1
+    
+    # Update campaign status
+    await db.campaigns.update_one(
+        {"id": campaign_id},
+        {"$set": {"status": "sent", "sent_count": sent_count}}
+    )
+    
+    return {"message": f"Campaign sent to {sent_count} users"}
+
+# Notification Routes
+@api_router.get("/notifications", response_model=List[Notification])
+async def get_notifications(user_id: str):
+    notifications = await db.notifications.find({"user_id": user_id}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    for notif in notifications:
+        if isinstance(notif['created_at'], str):
+            notif['created_at'] = datetime.fromisoformat(notif['created_at'])
+    return notifications
+
+@api_router.put("/notifications/{notification_id}/read")
+async def mark_notification_read(notification_id: str):
+    await db.notifications.update_one({"id": notification_id}, {"$set": {"read": True}})
+    return {"message": "Notification marked as read"}
+
+# Review Routes
+@api_router.post("/reviews", response_model=Review)
+async def create_review(review: ReviewCreate):
+    review_obj = Review(**review.model_dump())
+    doc = review_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.reviews.insert_one(doc)
+    return review_obj
+
+@api_router.get("/reviews", response_model=List[Review])
+async def get_reviews(appointment_id: Optional[str] = None):
+    query = {}
+    if appointment_id:
+        query["appointment_id"] = appointment_id
+    reviews = await db.reviews.find(query, {"_id": 0}).to_list(1000)
+    for review in reviews:
+        if isinstance(review['created_at'], str):
+            review['created_at'] = datetime.fromisoformat(review['created_at'])
+    return reviews
+
+# Stats Routes
+@api_router.get("/stats", response_model=Stats)
+async def get_stats():
+    total_appointments = await db.appointments.count_documents({})
+    pending = await db.appointments.count_documents({"status": "pending"})
+    confirmed = await db.appointments.count_documents({"status": "confirmed"})
+    completed = await db.appointments.count_documents({"status": "completed"})
+    cancelled = await db.appointments.count_documents({"status": "cancelled"})
+    total_patients = await db.users.count_documents({"role": "patient"})
+    total_doctors = await db.doctors.count_documents({})
+    
+    # Calculate average rating
+    reviews = await db.reviews.find({}, {"_id": 0, "rating": 1}).to_list(10000)
+    avg_rating = sum(r['rating'] for r in reviews) / len(reviews) if reviews else 0
+    
+    return Stats(
+        total_appointments=total_appointments,
+        pending_appointments=pending,
+        confirmed_appointments=confirmed,
+        completed_appointments=completed,
+        cancelled_appointments=cancelled,
+        total_patients=total_patients,
+        total_doctors=total_doctors,
+        avg_rating=round(avg_rating, 2)
+    )
 
 # Include the router in the main app
 app.include_router(api_router)
