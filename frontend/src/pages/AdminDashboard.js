@@ -285,10 +285,18 @@ const AppointmentsTable = ({ appointments, onUpdate }) => {
                 </td>
                 <td className="px-6 py-4">
                   {apt.notes ? (
-                    <div className="max-w-xs">
-                      <p className="text-sm text-gray-700 line-clamp-2" title={apt.notes}>
+                    <div>
+                      <p className="text-sm text-gray-700 line-clamp-2 mb-1">
                         {apt.notes}
                       </p>
+                      <Button 
+                        variant="link" 
+                        size="sm" 
+                        className="h-auto p-0 text-blue-600"
+                        onClick={() => setSelectedAppointment(apt)}
+                      >
+                        عرض الكل
+                      </Button>
                     </div>
                   ) : (
                     <span className="text-sm text-gray-400">-</span>
