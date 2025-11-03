@@ -556,17 +556,19 @@ async def update_appointment(appointment_id: str, update: AppointmentUpdate):
     
     # Send notification if status changed to confirmed
     if update.status == AppointmentStatus.CONFIRMED:
-        if apt.get('patient_id'):
-            # Send in-app notification
-            await send_notification(
-                apt['patient_id'],
-                "تم تأكيد موعدك",
-                f"تم تأكيد موعدك مع د. {apt['doctor_name']} في {apt['appointment_date']}",
-                "reminder",
-                appointment_id
-            )
+        # Check if patient_phone exists (always present in appointments)
+        if apt.get('patient_phone'):
+            # Send in-app notification (only if patient has an ID)
+            if apt.get('patient_id') and apt['patient_id']:
+                await send_notification(
+                    apt['patient_id'],
+                    "تم تأكيد موعدك",
+                    f"تم تأكيد موعدك مع د. {apt['doctor_name']} في {apt['appointment_date']}",
+                    "reminder",
+                    appointment_id
+                )
             
-            # Send push notification via OneSignal
+            # Send push notification via OneSignal (for ALL patients)
             try:
                 async with httpx.AsyncClient() as client:
                     headers = {
@@ -597,7 +599,7 @@ async def update_appointment(appointment_id: str, update: AppointmentUpdate):
                     )
                     
                     if response.status_code == 200:
-                        print(f"✅ Confirmation push notification sent")
+                        print(f"✅ Confirmation push notification sent for patient: {apt['patient_phone']}")
                     else:
                         print(f"❌ Failed to send push notification: {response.text}")
             except Exception as e:
