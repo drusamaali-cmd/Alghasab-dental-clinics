@@ -156,6 +156,18 @@ backend:
           agent: "testing"
           comment: "✅ COMPREHENSIVE TESTING COMPLETED - ALL TESTS PASSED: 1) Admin can create appointments without patient_id (empty string) ✅ 2) Appointments can be retrieved by patient_phone parameter ✅ 3) Patient data verification (name, phone, doctor, service, date) all match ✅ 4) Edge case testing - different phone numbers correctly isolated ✅ 5) Frontend integration confirmed - PatientDashboard uses patient_phone query ✅. The appointment linking feature works perfectly: when admin adds appointment manually with patient name and phone, the patient can see their appointments when they login later with same phone number."
 
+  - task: "Automatic appointment reminders (24h and 3h before)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "IMPLEMENTED: Added APScheduler for automatic reminders. System checks every 30 minutes for confirmed appointments. Sends OneSignal notification 24 hours before appointment and 3 hours before appointment. Uses reminder_24h_sent and reminder_3h_sent flags to prevent duplicate notifications. Scheduler starts on app startup."
+
 frontend:
   - task: "Display confirmed appointments in patient dashboard"
     implemented: true
