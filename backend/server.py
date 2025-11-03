@@ -34,6 +34,10 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 SECRET_KEY = os.environ.get("SECRET_KEY", "your-secret-key-change-in-production")
 ALGORITHM = "HS256"
 
+# OneSignal Configuration
+ONESIGNAL_APP_ID = "3adbb1be-a764-4977-a22c-0de12043ac2e"
+ONESIGNAL_REST_API_KEY = os.environ.get("ONESIGNAL_REST_API_KEY", "")  # سنحتاجه لاحقاً
+
 # Enums
 class UserRole(str, Enum):
     ADMIN = "admin"
