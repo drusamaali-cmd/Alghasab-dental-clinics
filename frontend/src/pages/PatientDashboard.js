@@ -94,11 +94,8 @@ const PatientDashboard = ({ user, onLogout }) => {
       <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center">
-              <Calendar className="w-5 h-5 text-white" />
-            </div>
+            <img src="/logo.png" alt="عيادات الغصاب" className="h-12 w-auto" />
             <div>
-              <h1 className="text-xl font-bold text-gray-900">عيادات الغصاب</h1>
               <p className="text-sm text-gray-600">مرحباً {user.name || user.phone}</p>
             </div>
           </div>
