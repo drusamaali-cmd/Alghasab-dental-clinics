@@ -149,11 +149,12 @@ metadata:
 test_plan:
   current_focus:
     - "Send OneSignal push notification on appointment confirmation"
-  stuck_tasks:
-    - "Send OneSignal push notification on appointment confirmation"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
     - agent: "main"
       message: "Starting investigation of appointment confirmation notifications. Will test the complete flow: create appointment -> confirm appointment -> verify OneSignal API call and notification delivery."
+    - agent: "testing"
+      message: "CRITICAL ISSUE FOUND: Appointment confirmation notifications fail because patient_id is empty string when appointments are created. The notification code at line 559 checks 'if apt.get('patient_id'):' which fails for empty strings. OneSignal API and configuration are working correctly. Fix needed in server.py line 559 to check patient_phone instead of patient_id, or ensure patient_id is properly populated during appointment creation."
