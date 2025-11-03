@@ -209,6 +209,17 @@ const PatientDashboard = ({ user, onLogout }) => {
               </form>
             </DialogContent>
           </Dialog>
+          
+          {/* Google Maps Review Button */}
+          <Button 
+            size="lg" 
+            onClick={() => window.open('https://maps.app.goo.gl/qiCBGYcxLRaPLRN77?g_st=aw', '_blank')}
+            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
+            data-testid="review-button"
+          >
+            <Star className="w-5 h-5 ml-2" />
+            قيّم زيارتك على Google Maps
+          </Button>
         </div>
 
         {/* Tabs */}
