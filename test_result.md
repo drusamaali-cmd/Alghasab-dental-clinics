@@ -168,11 +168,11 @@ frontend:
   
   - task: "Landing page - Fix 'Learn More' button scroll"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/pages/LandingPage.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: false
           agent: "user"
@@ -180,14 +180,17 @@ frontend:
         - working: "NA"
           agent: "main"
           comment: "FIXED: Changed from getElementById to useRef for better React integration. Button now smoothly scrolls to features section when clicked. Uses featuresRef with scrollIntoView behavior."
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED AND WORKING: 'Learn More' button (تعرف أكثر) successfully scrolls from initial position (0px) to features section (550px). Smooth scroll animation works correctly and features section becomes visible after clicking. Button functionality is working as expected."
   
   - task: "Google Maps review integration for completed appointments"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/pages/PatientDashboard.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: false
           agent: "user"
@@ -195,6 +198,9 @@ frontend:
         - working: "NA"
           agent: "main"
           comment: "IMPLEMENTED: Added Google Maps review button for completed appointments. When appointment status is 'completed', a green button appears that opens Google Maps review page (https://maps.app.goo.gl/qiCBGYcxLRaPLRN77) in new tab. Button has star icon and attractive styling."
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED AND WORKING: Google Maps review button appears correctly for completed appointments. Button has proper green gradient styling (from-green-600 to-green-700). Clicking opens Google Maps in new tab (URL redirects to full Google Maps page as expected). Button text 'قيّم زيارتك على Google Maps' displays correctly. Feature is fully functional."
 
 metadata:
   created_by: "main_agent"
