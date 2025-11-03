@@ -57,16 +57,31 @@ const PatientDashboard = ({ user, onLogout }) => {
   const handleBookAppointment = async (e) => {
     e.preventDefault();
     try {
+      // Create a temporary datetime (will be updated by admin later)
+      const tempDate = new Date(newAppointment.preferred_date);
+      // Set time based on period
+      if (newAppointment.preferred_time_period === 'morning') {
+        tempDate.setHours(9, 0, 0); // 9 AM
+      } else {
+        tempDate.setHours(16, 0, 0); // 4 PM
+      }
+      
+      const timePeriodText = newAppointment.preferred_time_period === 'morning' ? 'صباحاً' : 'مساءً';
+      const notesWithPeriod = `الفترة المفضلة: ${timePeriodText}\n${newAppointment.notes || ''}`;
+      
       await axios.post(`${API}/appointments`, {
         patient_id: user.id,
         patient_name: user.name || user.phone,
         patient_phone: user.phone,
-        ...newAppointment,
+        doctor_id: newAppointment.doctor_id,
+        service_id: newAppointment.service_id,
+        appointment_date: tempDate.toISOString(),
+        notes: notesWithPeriod,
         created_by: 'patient'
       });
-      toast.success('تم حجز الموعد بنجاح');
+      toast.success('تم إرسال طلب الحجز بنجاح! سنتصل بك لتأكيد الموعد');
       setShowBookDialog(false);
-      setNewAppointment({ doctor_id: '', service_id: '', appointment_date: '', notes: '' });
+      setNewAppointment({ doctor_id: '', service_id: '', preferred_date: '', preferred_time_period: '', notes: '' });
       fetchData();
     } catch (error) {
       toast.error('خطأ في حجز الموعد');
