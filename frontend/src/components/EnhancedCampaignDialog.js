@@ -239,6 +239,67 @@ const EnhancedCampaignDialog = ({ open, onOpenChange, onSuccess }) => {
             <div className="space-y-4">
               <Label className="text-lg">من سيستقبل هذا العرض؟</Label>
               
+              {/* عدد المستلمين */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3">
+                <h4 className="font-bold text-blue-900 flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  عدد المستلمين
+                </h4>
+                
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      id="all-users"
+                      name="recipient-mode"
+                      checked={recipientMode === 'all'}
+                      onChange={() => {
+                        setRecipientMode('all');
+                        setFormData({...formData, max_recipients: null});
+                      }}
+                      className="w-4 h-4"
+                    />
+                    <Label htmlFor="all-users" className="cursor-pointer">
+                      إرسال لجميع المراجعين المسجلين
+                    </Label>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        id="limited-users"
+                        name="recipient-mode"
+                        checked={recipientMode === 'limited'}
+                        onChange={() => setRecipientMode('limited')}
+                        className="w-4 h-4"
+                      />
+                      <Label htmlFor="limited-users" className="cursor-pointer">
+                        إرسال لعدد محدد (عشوائي)
+                      </Label>
+                    </div>
+                    
+                    {recipientMode === 'limited' && (
+                      <div className="mr-6 space-y-2">
+                        <Label>عدد المستلمين:</Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          max="100000"
+                          placeholder="مثال: 5000"
+                          value={formData.max_recipients || ''}
+                          onChange={(e) => setFormData({...formData, max_recipients: parseInt(e.target.value)})}
+                          className="max-w-xs"
+                        />
+                        <p className="text-sm text-gray-600">
+                          💡 سيتم اختيار المستلمين بشكل عشوائي بدون تكرار
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
               <div className="grid gap-3">
                 <AudienceOption
                   value="all"
@@ -247,7 +308,7 @@ const EnhancedCampaignDialog = ({ open, onOpenChange, onSuccess }) => {
                   icon={<Users className="w-5 h-5" />}
                   title="جميع المراجعين"
                   description="إرسال لجميع المستخدمين المسجلين"
-                  count="~1000 مراجع"
+                  count="~30,000 مراجع"
                 />
                 
                 <AudienceOption
@@ -257,7 +318,7 @@ const EnhancedCampaignDialog = ({ open, onOpenChange, onSuccess }) => {
                   icon={<TrendingUp className="w-5 h-5" />}
                   title="المراجعين النشطين"
                   description="من زاروا العيادة خلال آخر 6 أشهر"
-                  count="~650 مراجع"
+                  count="~15,000 مراجع"
                 />
                 
                 <AudienceOption
@@ -267,7 +328,7 @@ const EnhancedCampaignDialog = ({ open, onOpenChange, onSuccess }) => {
                   icon={<Calendar className="w-5 h-5" />}
                   title="المراجعين غير النشطين"
                   description="لم يزوروا العيادة منذ أكثر من 6 أشهر"
-                  count="~350 مراجع"
+                  count="~10,000 مراجع"
                 />
                 
                 <AudienceOption
@@ -277,7 +338,7 @@ const EnhancedCampaignDialog = ({ open, onOpenChange, onSuccess }) => {
                   icon={<Gift className="w-5 h-5" />}
                   title="المراجعين الجدد"
                   description="سجلوا خلال آخر شهر"
-                  count="~200 مراجع"
+                  count="~2,000 مراجع"
                 />
               </div>
             </div>
@@ -288,7 +349,11 @@ const EnhancedCampaignDialog = ({ open, onOpenChange, onSuccess }) => {
                   <Users className="w-5 h-5 text-green-600" />
                   <h4 className="font-bold text-green-900">الوصول المتوقع</h4>
                 </div>
-                <p className="text-2xl font-bold text-green-700">{estimatedReach} مراجع</p>
+                <p className="text-2xl font-bold text-green-700">
+                  {recipientMode === 'limited' && formData.max_recipients 
+                    ? formData.max_recipients 
+                    : estimatedReach} مراجع
+                </p>
                 <p className="text-sm text-green-600 mt-1">سيستلمون هذا العرض فوراً</p>
               </div>
             )}
