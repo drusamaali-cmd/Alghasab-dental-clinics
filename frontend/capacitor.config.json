@@ -1,5 +1,20 @@
 {
   "appId": "com.alghasab.dentalclinic",
   "appName": "Alghasab Clinic",
-  "webDir": "build"
+  "webDir": "build",
+  "server": {
+    "androidScheme": "https",
+    "iosScheme": "https"
+  },
+  "plugins": {
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
+    },
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#3B82F6",
+      "showSpinner": true,
+      "spinnerColor": "#FFFFFF"
+    }
+  }
 }
