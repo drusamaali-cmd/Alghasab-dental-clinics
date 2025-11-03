@@ -74,7 +74,7 @@ const LandingPage = () => {
       </section>
 
       {/* Features Section */}
-      <section id="features-section" className="container mx-auto px-4 py-20">
+      <section ref={featuresRef} className="container mx-auto px-4 py-20">
         <h3 className="text-4xl font-bold text-center text-gray-900 mb-16">
           لماذا تختار <span className="text-blue-600">عيادات الغصاب</span>؟
         </h3>
