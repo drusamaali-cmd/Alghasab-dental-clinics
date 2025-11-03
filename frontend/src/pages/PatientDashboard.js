@@ -167,6 +167,50 @@ const PatientDashboard = ({ user, onLogout }) => {
       </header>
 
       <div className="container mx-auto px-4 py-8">
+        {/* Notification Prompt Banner */}
+        {showNotificationPrompt && notificationPermission !== 'granted' && (
+          <div className="mb-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg shadow-lg p-6 animate-fade-in">
+            <div className="flex items-start gap-4">
+              <Bell className="w-8 h-8 flex-shrink-0 animate-pulse" />
+              <div className="flex-1">
+                <h3 className="text-xl font-bold mb-2">🔔 فعّل الإشعارات الآن!</h3>
+                <p className="text-blue-50 mb-4 leading-relaxed">
+                  للاستفادة الكاملة من التطبيق، فعّل الإشعارات لتستلم:
+                </p>
+                <ul className="space-y-2 mb-4 text-blue-50">
+                  <li className="flex items-center gap-2">
+                    <span className="text-yellow-300">✅</span> تذكير قبل موعدك بـ 24 ساعة
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-yellow-300">✅</span> تذكير قبل موعدك بـ 3 ساعات
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-yellow-300">✅</span> تأكيد حجز موعدك فوراً
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-yellow-300">✅</span> عروض وخصومات حصرية
+                  </li>
+                </ul>
+                <div className="flex gap-3">
+                  <Button
+                    onClick={handleEnableNotifications}
+                    className="bg-white text-blue-700 hover:bg-blue-50 font-bold"
+                  >
+                    <Bell className="w-4 h-4 ml-2" />
+                    تفعيل الإشعارات الآن
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => setShowNotificationPrompt(false)}
+                    className="text-white hover:bg-blue-800"
+                  >
+                    لاحقاً
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {/* Quick Actions */}
         <div className="mb-8 flex gap-4 flex-wrap">
           <Dialog open={showBookDialog} onOpenChange={setShowBookDialog}>
