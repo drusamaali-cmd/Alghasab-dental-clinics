@@ -6,7 +6,7 @@
 
 **1. سجل دخول على لوحة الإدارة**
 ```
-https://smartsmile-app.preview.emergentagent.com/admin/login
+https://dental-booking-app.preview.emergentagent.com/admin/login
 Username: admin
 Password: Admin@Alghasab2025
 ```

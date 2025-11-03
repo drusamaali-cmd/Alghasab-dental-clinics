@@ -4,12 +4,12 @@
 
 **للمراجعين (العملاء):**
 ```
-https://smartsmile-app.preview.emergentagent.com/patient/login
+https://dental-booking-app.preview.emergentagent.com/patient/login
 ```
 
 **للإدارة:**
 ```
-https://smartsmile-app.preview.emergentagent.com/admin/login
+https://dental-booking-app.preview.emergentagent.com/admin/login
 ```
 
 ---
@@ -32,7 +32,7 @@ https://smartsmile-app.preview.emergentagent.com/admin/login
 • عرض سجل مواعيدك السابقة
 
 🔗 للدخول على التطبيق:
-https://smartsmile-app.preview.emergentagent.com/patient/login
+https://dental-booking-app.preview.emergentagent.com/patient/login
 
 📝 طريقة التسجيل:
 1. اضغط على الرابط
@@ -51,7 +51,7 @@ https://smartsmile-app.preview.emergentagent.com/patient/login
 ```
 عيادات الغصاب 🦷
 احجز موعدك الآن عبر تطبيقنا الجديد:
-https://smartsmile-app.preview.emergentagent.com/patient/login
+https://dental-booking-app.preview.emergentagent.com/patient/login
 ```
 
 ---
@@ -69,7 +69,7 @@ https://smartsmile-app.preview.emergentagent.com/patient/login
 ✅ متابعة مواعيدك
 
 🔗 سجل الآن: 
-https://smartsmile-app.preview.emergentagent.com/patient/login
+https://dental-booking-app.preview.emergentagent.com/patient/login
 
 #عيادات_الغصاب #طب_الأسنان #الرياض #السعودية
 ```
@@ -86,7 +86,7 @@ https://smartsmile-app.preview.emergentagent.com/patient/login
 
 **الرابط للإدخال:**
 ```
-https://smartsmile-app.preview.emergentagent.com/patient/login
+https://dental-booking-app.preview.emergentagent.com/patient/login
 ```
 
 **أماكن وضع QR Code:**
@@ -143,7 +143,7 @@ https://smartsmile-app.preview.emergentagent.com/patient/login
 ✓ عرض تاريخك الطبي ومواعيدك السابقة
 
 للبدء:
-اضغط على الرابط: https://smartsmile-app.preview.emergentagent.com/patient/login
+اضغط على الرابط: https://dental-booking-app.preview.emergentagent.com/patient/login
 
 نحن في خدمتكم دائماً 🌟
 

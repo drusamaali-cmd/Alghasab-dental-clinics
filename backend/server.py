@@ -586,7 +586,7 @@ async def update_appointment(appointment_id: str, update: AppointmentUpdate):
                             "en": f"موعدك مع د. {apt['doctor_name']}\n{formatted_date}\n\nنتطلع لرؤيتك 🦷",
                             "ar": f"موعدك مع د. {apt['doctor_name']}\n{formatted_date}\n\nنتطلع لرؤيتك 🦷"
                         },
-                        "url": "https://smartsmile-app.preview.emergentagent.com/patient/dashboard"
+                        "url": "https://dental-booking-app.preview.emergentagent.com/patient/dashboard"
                     }
                     
                     response = await client.post(
@@ -653,7 +653,7 @@ async def send_campaign(campaign_id: str, background_tasks: BackgroundTasks):
                 "included_segments": ["All"],  # جميع المشتركين
                 "headings": {"en": campaign['title'], "ar": campaign['title']},
                 "contents": {"en": campaign['message'], "ar": campaign['message']},
-                "url": "https://smartsmile-app.preview.emergentagent.com/patient/dashboard"
+                "url": "https://dental-booking-app.preview.emergentagent.com/patient/dashboard"
             }
             
             response = await client.post(
