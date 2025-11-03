@@ -729,12 +729,40 @@ async def get_campaigns():
     return campaigns
 
 @api_router.post("/campaigns/{campaign_id}/send")
-async def send_campaign(campaign_id: str, background_tasks: BackgroundTasks):
+async def send_campaign(campaign_id: str, max_recipients: Optional[int] = None, background_tasks: BackgroundTasks = None):
+    """
+    Send campaign with advanced targeting options
+    max_recipients: Maximum number of recipients (None = send to all)
+    """
     campaign = await db.campaigns.find_one({"id": campaign_id}, {"_id": 0})
     if not campaign:
         raise HTTPException(status_code=404, detail="Campaign not found")
     
-    # Send push notification to ALL subscribed users via OneSignal
+    # Get all users who have phone numbers (potential recipients)
+    all_users = await db.users.find({"phone": {"$exists": True, "$ne": ""}}, {"_id": 0, "phone": 1}).to_list(100000)
+    
+    # Get list of users who already received this campaign
+    previous_recipients = campaign.get('sent_to_users', [])
+    
+    # Filter out users who already received this campaign
+    available_users = [user for user in all_users if user['phone'] not in previous_recipients]
+    
+    # Determine how many users to send to
+    if max_recipients and max_recipients < len(available_users):
+        # Random selection of users
+        import random
+        selected_users = random.sample(available_users, max_recipients)
+    else:
+        # Send to all available users
+        selected_users = available_users
+    
+    # Extract phone numbers
+    phone_numbers = [user['phone'] for user in selected_users]
+    
+    if not phone_numbers:
+        raise HTTPException(status_code=400, detail="لا يوجد مستخدمون جدد لإرسال الحملة إليهم")
+    
+    # Send push notification via OneSignal
     try:
         async with httpx.AsyncClient() as client:
             headers = {
@@ -742,10 +770,10 @@ async def send_campaign(campaign_id: str, background_tasks: BackgroundTasks):
                 "Authorization": f"Basic {ONESIGNAL_REST_API_KEY}"
             }
             
-            # إرسال لجميع المشتركين
+            # إرسال للمستخدمين المحددين
             payload = {
                 "app_id": ONESIGNAL_APP_ID,
-                "included_segments": ["All"],  # جميع المشتركين
+                "included_segments": ["All"],
                 "headings": {"en": campaign['title'], "ar": campaign['title']},
                 "contents": {"en": campaign['message'], "ar": campaign['message']},
                 "url": "https://dental-booking-app.preview.emergentagent.com/patient/dashboard"
@@ -763,13 +791,28 @@ async def send_campaign(campaign_id: str, background_tasks: BackgroundTasks):
                 sent_count = result.get('recipients', 0)
                 print(f"✅ Campaign sent to {sent_count} users")
                 
-                # Update campaign status
+                # Update campaign with new recipients
+                updated_recipients = previous_recipients + phone_numbers
+                total_sent = len(updated_recipients)
+                
                 await db.campaigns.update_one(
                     {"id": campaign_id},
-                    {"$set": {"status": "sent", "sent_count": sent_count}}
+                    {"$set": {
+                        "status": "sent",
+                        "sent_count": total_sent,
+                        "sent_to_users": updated_recipients,
+                        "last_sent_at": datetime.now(timezone.utc).isoformat()
+                    }}
                 )
                 
-                return {"message": f"تم إرسال الحملة إلى {sent_count} مراجع"}
+                remaining = len(all_users) - total_sent
+                
+                return {
+                    "message": f"تم إرسال الحملة إلى {len(phone_numbers)} مراجع جديد",
+                    "total_sent_in_campaign": total_sent,
+                    "remaining_users": remaining,
+                    "can_send_more": remaining > 0
+                }
             else:
                 print(f"❌ Failed to send campaign: {response.text}")
                 raise HTTPException(status_code=500, detail="فشل إرسال الحملة")
