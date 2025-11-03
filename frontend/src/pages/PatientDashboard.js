@@ -23,6 +23,8 @@ const PatientDashboard = ({ user, onLogout }) => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showBookDialog, setShowBookDialog] = useState(false);
+  const [showNotificationPrompt, setShowNotificationPrompt] = useState(false);
+  const [notificationPermission, setNotificationPermission] = useState('default');
   const [newAppointment, setNewAppointment] = useState({
     doctor_id: '',
     service_id: '',
@@ -33,7 +35,49 @@ const PatientDashboard = ({ user, onLogout }) => {
 
   useEffect(() => {
     fetchData();
+    checkNotificationPermission();
   }, []);
+
+  const checkNotificationPermission = async () => {
+    // Check if notifications are supported
+    if ('Notification' in window && window.OneSignal) {
+      try {
+        await window.OneSignal.init({
+          appId: "3adbb1be-a764-4977-a22c-0de12043ac2e"
+        });
+        
+        const permission = await window.OneSignal.Notifications.permission;
+        setNotificationPermission(permission ? 'granted' : 'default');
+        
+        // Show prompt if not granted
+        if (!permission) {
+          setShowNotificationPrompt(true);
+        }
+      } catch (error) {
+        console.log('OneSignal check error:', error);
+      }
+    }
+  };
+
+  const handleEnableNotifications = async () => {
+    try {
+      if (window.OneSignal) {
+        await window.OneSignal.Slidedown.promptPush();
+        
+        // Check permission after prompt
+        setTimeout(async () => {
+          const permission = await window.OneSignal.Notifications.permission;
+          if (permission) {
+            setNotificationPermission('granted');
+            setShowNotificationPrompt(false);
+            toast.success('تم تفعيل الإشعارات بنجاح! 🎉');
+          }
+        }, 1000);
+      }
+    } catch (error) {
+      console.log('Error enabling notifications:', error);
+    }
+  };
 
   const fetchData = async () => {
     try {
