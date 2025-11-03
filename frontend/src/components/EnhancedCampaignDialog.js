@@ -114,16 +114,21 @@ const EnhancedCampaignDialog = ({ open, onOpenChange, onSuccess }) => {
     try {
       const response = await axios.post(`${API}/campaigns`, formData);
       
-      // Auto-send the campaign
-      await axios.post(`${API}/campaigns/${response.data.id}/send`);
+      // Send campaign with optional max_recipients
+      const sendUrl = formData.max_recipients 
+        ? `${API}/campaigns/${response.data.id}/send?max_recipients=${formData.max_recipients}`
+        : `${API}/campaigns/${response.data.id}/send`;
       
-      toast.success(`تم إرسال الحملة بنجاح إلى ${estimatedReach} مراجع! 🎉`);
+      const sendResponse = await axios.post(sendUrl);
+      
+      toast.success(sendResponse.data.message || 'تم إرسال الحملة بنجاح! 🎉');
       onOpenChange(false);
       setStep(1);
-      setFormData({ title: '', message: '', target_audience: 'all', scheduled_for: null });
+      setFormData({ title: '', message: '', target_audience: 'all', scheduled_for: null, max_recipients: null });
+      setRecipientMode('all');
       onSuccess();
     } catch (error) {
-      toast.error('خطأ في إرسال الحملة');
+      toast.error(error.response?.data?.detail || 'خطأ في إرسال الحملة');
     } finally {
       setLoading(false);
     }
