@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Calendar, Clock, Bell, Award, Users, Star } from 'lucide-react';
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const featuresRef = useRef(null);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-50">
