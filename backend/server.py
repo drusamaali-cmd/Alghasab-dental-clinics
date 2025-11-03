@@ -820,6 +820,31 @@ async def send_campaign(campaign_id: str, max_recipients: Optional[int] = None, 
     except Exception as e:
         print(f"Error sending campaign: {e}")
         raise HTTPException(status_code=500, detail=f"خطأ في إرسال الحملة: {str(e)}")
+
+@api_router.get("/campaigns/{campaign_id}/reach")
+async def get_campaign_reach(campaign_id: str):
+    """Get information about campaign reach and remaining users"""
+    campaign = await db.campaigns.find_one({"id": campaign_id}, {"_id": 0})
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+    
+    # Get total registered users
+    total_users = await db.users.count_documents({"phone": {"$exists": True, "$ne": ""}})
+    
+    # Get users who already received this campaign
+    previous_recipients = campaign.get('sent_to_users', [])
+    sent_count = len(previous_recipients)
+    
+    # Calculate remaining
+    remaining = total_users - sent_count
+    
+    return {
+        "total_users": total_users,
+        "sent_count": sent_count,
+        "remaining_users": remaining,
+        "can_send_more": remaining > 0,
+        "percentage_reached": round((sent_count / total_users * 100) if total_users > 0 else 0, 1)
+    }
     
     # Also save to database notifications (backup)
     users = await db.users.find({"role": "patient"}, {"_id": 0}).to_list(10000)
