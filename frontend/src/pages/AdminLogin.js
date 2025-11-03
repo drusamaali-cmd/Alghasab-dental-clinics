@@ -84,11 +84,6 @@ const AdminLogin = ({ onLogin }) => {
                   />
                 </div>
               </div>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
-                <p className="font-medium">بيانات الدخول:</p>
-                <p>Username: <code className="bg-white px-2 py-1 rounded">admin</code></p>
-                <p>Password: <code className="bg-white px-2 py-1 rounded">YourNewPassword@2025</code></p>
-              </div>
               <Button 
                 type="submit" 
                 className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 py-6 text-lg"
