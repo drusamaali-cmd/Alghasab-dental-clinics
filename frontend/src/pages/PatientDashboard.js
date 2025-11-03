@@ -124,7 +124,7 @@ const PatientDashboard = ({ user, onLogout }) => {
 
       <div className="container mx-auto px-4 py-8">
         {/* Quick Actions */}
-        <div className="mb-8">
+        <div className="mb-8 flex gap-4 flex-wrap">
           <Dialog open={showBookDialog} onOpenChange={setShowBookDialog}>
             <DialogTrigger asChild>
               <Button size="lg" className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800" data-testid="book-appointment-btn">
