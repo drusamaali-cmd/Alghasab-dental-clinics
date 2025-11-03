@@ -334,6 +334,10 @@ const AppointmentCard = ({ appointment, isPast }) => {
     completed: 'مكتمل'
   };
 
+  const handleReviewClick = () => {
+    window.open('https://maps.app.goo.gl/qiCBGYcxLRaPLRN77?g_st=aw', '_blank');
+  };
+
   return (
     <Card className="card-hover" data-testid="appointment-card">
       <CardHeader>
@@ -356,6 +360,17 @@ const AppointmentCard = ({ appointment, isPast }) => {
         </div>
         {appointment.notes && (
           <p className="text-sm text-gray-600 mt-2">{appointment.notes}</p>
+        )}
+        
+        {/* Google Review Button for completed appointments */}
+        {appointment.status === 'completed' && (
+          <Button 
+            onClick={handleReviewClick}
+            className="mt-4 w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white"
+          >
+            <Star className="w-4 h-4 mr-2" />
+            قيّم زيارتك على Google Maps
+          </Button>
         )}
       </CardContent>
     </Card>
