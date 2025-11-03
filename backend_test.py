@@ -453,9 +453,15 @@ def test_appointment_linking_by_phone():
         print(f"   Found: {test_appointment['service_id']}")
         verification_passed = False
     
-    # Check appointment date
+    # Check appointment date (normalize timezone formats)
     expected_date = appointment_data['appointment_date']
-    if test_appointment['appointment_date'] == expected_date:
+    found_date = test_appointment['appointment_date']
+    
+    # Normalize timezone formats: +00:00 and Z are equivalent
+    expected_normalized = expected_date.replace('+00:00', 'Z')
+    found_normalized = found_date.replace('+00:00', 'Z')
+    
+    if found_normalized == expected_normalized:
         print(f"✅ Appointment date matches: {test_appointment['appointment_date']}")
     else:
         print(f"❌ Appointment date mismatch:")
