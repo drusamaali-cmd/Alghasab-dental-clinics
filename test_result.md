@@ -111,11 +111,11 @@ user_problem_statement: |
 backend:
   - task: "Send OneSignal push notification on appointment confirmation"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: false
           agent: "user"
@@ -129,6 +129,9 @@ backend:
         - working: "NA"
           agent: "main"
           comment: "FIXED: Changed condition from 'if apt.get('patient_id'):' to 'if apt.get('patient_phone'):' at line 559. Now OneSignal push notifications will be sent for ALL appointments when status changes to CONFIRMED, regardless of patient_id value. In-app notifications only sent if patient_id exists. Ready for retesting."
+        - working: true
+          agent: "testing"
+          comment: "✅ FIX CONFIRMED WORKING: Tested complete appointment confirmation flow. Created appointment with empty patient_id but valid patient_phone (+966501234567), confirmed appointment, and verified OneSignal push notification was sent successfully. Backend logs show '✅ Confirmation push notification sent for patient: +966501234567'. OneSignal API returns 200 status. The fix at line 559 (checking patient_phone instead of patient_id) is working correctly for ALL appointments."
 
 frontend:
   - task: "Display confirmed appointments in patient dashboard"
