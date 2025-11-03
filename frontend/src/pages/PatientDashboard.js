@@ -26,7 +26,8 @@ const PatientDashboard = ({ user, onLogout }) => {
   const [newAppointment, setNewAppointment] = useState({
     doctor_id: '',
     service_id: '',
-    appointment_date: '',
+    preferred_date: '',
+    preferred_time_period: '', // 'morning' or 'evening'
     notes: ''
   });
 
