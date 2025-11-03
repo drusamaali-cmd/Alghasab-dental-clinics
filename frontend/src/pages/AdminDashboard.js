@@ -78,10 +78,13 @@ const AdminDashboard = ({ user, onLogout }) => {
               <h1 className="text-2xl font-bold">لوحة تحكم عيادات الغصاب</h1>
               <p className="text-blue-100">مرحباً {user.name}</p>
             </div>
-            <Button variant="ghost" className="text-white hover:bg-blue-700" onClick={onLogout} data-testid="logout-btn">
-              <LogOut className="w-4 h-4 ml-2" />
-              تسجيل الخروج
-            </Button>
+            <div className="flex gap-3 items-center">
+              <ChangePasswordDialog userId={user.id} />
+              <Button variant="ghost" className="text-white hover:bg-blue-700" onClick={onLogout} data-testid="logout-btn">
+                <LogOut className="w-4 h-4 ml-2" />
+                تسجيل الخروج
+              </Button>
+            </div>
           </div>
         </div>
       </header>
