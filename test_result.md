@@ -101,3 +101,56 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: |
+  Alghasab Dental Clinic PWA - Patient facing app with simplified booking (morning/evening slots) and admin dashboard.
+  Current issue: Push notifications work for marketing campaigns but NOT when admin confirms appointments.
+  Patient has to manually open app to check if appointment was confirmed.
+  Need: Automatic push notification when admin confirms appointment (similar to campaign notifications).
+
+backend:
+  - task: "Send OneSignal push notification on appointment confirmation"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "User reported notifications work for campaigns but not for appointment confirmations. Code exists at lines 558-604 in server.py to send OneSignal notification when status changes to CONFIRMED, but notifications are not being received."
+        - working: "NA"
+          agent: "main"
+          comment: "Investigating issue. Code is present with correct ONESIGNAL_REST_API_KEY. Need to test if API call is actually being made and if there are any errors."
+
+frontend:
+  - task: "Display confirmed appointments in patient dashboard"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/PatientDashboard.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "user"
+          comment: "Frontend displays appointments correctly. Patient can see confirmed appointments when they open the app."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Send OneSignal push notification on appointment confirmation"
+  stuck_tasks:
+    - "Send OneSignal push notification on appointment confirmation"
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+    - agent: "main"
+      message: "Starting investigation of appointment confirmation notifications. Will test the complete flow: create appointment -> confirm appointment -> verify OneSignal API call and notification delivery."
