@@ -15,20 +15,20 @@ const AdminLogin = ({ onLogin }) => {
   const handleLogin = async (e) => {
     e.preventDefault();
     
-    // Simple admin authentication (replace with real auth)
-    // غيّر كلمة المرور هنا:
-    if (username === 'admin' && password === 'YourNewPassword@2025') {
-      const adminUser = {
-        id: 'admin-1',
-        name: 'مدير النظام',
-        role: 'admin',
-        phone: '0500000000'
-      };
-      onLogin(adminUser, 'admin-token');
+    setLoading(true);
+    try {
+      const response = await axios.post(`${BACKEND_URL}/api/auth/admin/login`, {
+        username,
+        password
+      });
+      
+      onLogin(response.data.user, response.data.token);
       toast.success('مرحباً بك في لوحة التحكم');
       navigate('/admin/dashboard');
-    } else {
+    } catch (error) {
       toast.error('اسم المستخدم أو كلمة المرور غير صحيحة');
+    } finally {
+      setLoading(false);
     }
   };
 
