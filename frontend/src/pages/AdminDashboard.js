@@ -229,6 +229,11 @@ const StatsCard = ({ icon, title, value, color }) => {
 // Appointments Table
 const AppointmentsTable = ({ appointments, onUpdate }) => {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [editingAppointment, setEditingAppointment] = useState(null);
+  const [editForm, setEditForm] = useState({
+    appointment_date: '',
+    appointment_time: ''
+  });
   
   const handleStatusChange = async (id, status) => {
     try {
@@ -237,6 +242,29 @@ const AppointmentsTable = ({ appointments, onUpdate }) => {
       onUpdate();
     } catch (error) {
       toast.error('خطأ في تحديث حالة الموعد');
+    }
+  };
+
+  const handleEditClick = (apt) => {
+    setEditingAppointment(apt);
+    const date = new Date(apt.appointment_date);
+    setEditForm({
+      appointment_date: date.toISOString().split('T')[0],
+      appointment_time: date.toTimeString().slice(0, 5)
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      const dateTime = new Date(`${editForm.appointment_date}T${editForm.appointment_time}`);
+      await axios.put(`${API}/appointments/${editingAppointment.id}`, {
+        appointment_date: dateTime.toISOString()
+      });
+      toast.success('تم تحديث الموعد بنجاح');
+      setEditingAppointment(null);
+      onUpdate();
+    } catch (error) {
+      toast.error('خطأ في تحديث الموعد');
     }
   };
 
