@@ -870,4 +870,19 @@ logger = logging.getLogger(__name__)
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
+    scheduler.shutdown()
     client.close()
+
+@app.on_event("startup")
+async def startup_scheduler():
+    """Start the automatic reminder scheduler"""
+    # Run reminder check every 30 minutes
+    scheduler.add_job(
+        send_automatic_reminders,
+        'interval',
+        minutes=30,
+        id='reminder_checker',
+        replace_existing=True
+    )
+    scheduler.start()
+    print("✅ Automatic reminder scheduler started (checks every 30 minutes)")
