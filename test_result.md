@@ -104,9 +104,17 @@
 
 user_problem_statement: |
   Alghasab Dental Clinic PWA - Patient facing app with simplified booking (morning/evening slots) and admin dashboard.
-  Current issue: Push notifications work for marketing campaigns but NOT when admin confirms appointments.
-  Patient has to manually open app to check if appointment was confirmed.
-  Need: Automatic push notification when admin confirms appointment (similar to campaign notifications).
+  
+  Issues Fixed:
+  1. ✅ Push notifications not working for appointment confirmations (FIXED)
+  2. ✅ Landing page issues: 
+     - Number of happy patients changed from 10,000 to 30,000
+     - "Learn More" button not working (FIXED)
+     - Service rating mentioned but not implemented (ADDED: Google Maps review integration)
+  
+  New Features Added:
+  - Google Maps review button for completed appointments in Patient Dashboard
+  - Smooth scroll to features section on landing page
 
 backend:
   - task: "Send OneSignal push notification on appointment confirmation"
