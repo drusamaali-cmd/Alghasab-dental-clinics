@@ -233,8 +233,50 @@ async def send_notification(user_id: str, title: str, message: str, notification
     doc = notification.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
     await db.notifications.insert_one(doc)
-    # TODO: Integrate with Firebase Cloud Messaging
+    
+    # Send push notification via OneSignal
+    await send_onesignal_notification(user_id, title, message)
+    
     return notification
+
+async def send_onesignal_notification(user_id: str, title: str, message: str):
+    """Send push notification via OneSignal"""
+    if not ONESIGNAL_REST_API_KEY:
+        print("OneSignal REST API Key not configured")
+        return
+    
+    # Get user's OneSignal player ID (if stored)
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not user or not user.get('onesignal_player_id'):
+        print(f"User {user_id} has no OneSignal player ID")
+        return
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Basic {ONESIGNAL_REST_API_KEY}"
+            }
+            payload = {
+                "app_id": ONESIGNAL_APP_ID,
+                "include_player_ids": [user['onesignal_player_id']],
+                "headings": {"en": title, "ar": title},
+                "contents": {"en": message, "ar": message},
+                "url": "https://smartsmile-app.preview.emergentagent.com/patient/dashboard"
+            }
+            
+            response = await client.post(
+                "https://onesignal.com/api/v1/notifications",
+                headers=headers,
+                json=payload
+            )
+            
+            if response.status_code == 200:
+                print(f"✅ Push notification sent to user {user_id}")
+            else:
+                print(f"❌ Failed to send push notification: {response.text}")
+    except Exception as e:
+        print(f"Error sending OneSignal notification: {e}")
 
 # Admin Auth Models
 class AdminLogin(BaseModel):
