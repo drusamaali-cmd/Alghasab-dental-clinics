@@ -64,10 +64,12 @@ const EnhancedCampaignDialog = ({ open, onOpenChange, onSuccess }) => {
     title: '',
     message: '',
     target_audience: 'all',
-    scheduled_for: null
+    scheduled_for: null,
+    max_recipients: null // عدد المستلمين المحدد
   });
   const [loading, setLoading] = useState(false);
   const [estimatedReach, setEstimatedReach] = useState(0);
+  const [recipientMode, setRecipientMode] = useState('all'); // 'all' or 'limited'
 
   const handleTemplateSelect = (template) => {
     setSelectedTemplate(template);
