@@ -115,7 +115,7 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: false
           agent: "user"
@@ -123,6 +123,9 @@ backend:
         - working: "NA"
           agent: "main"
           comment: "Investigating issue. Code is present with correct ONESIGNAL_REST_API_KEY. Need to test if API call is actually being made and if there are any errors."
+        - working: false
+          agent: "testing"
+          comment: "ROOT CAUSE IDENTIFIED: Line 559 checks 'if apt.get('patient_id'):' but patient_id is empty string ('') when appointments are created without patient_id. Empty string is falsy in Python, so notification code never executes. OneSignal API works correctly when patient_id has value. SOLUTION: Change condition to 'if apt.get('patient_phone'):' or ensure patient_id is properly set during appointment creation."
 
 frontend:
   - task: "Display confirmed appointments in patient dashboard"
