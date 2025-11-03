@@ -61,9 +61,8 @@ const LandingPage = () => {
               size="lg"
               variant="outline"
               onClick={() => {
-                const featuresSection = document.getElementById('features-section');
-                if (featuresSection) {
-                  featuresSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                if (featuresRef.current) {
+                  featuresRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
               }}
               className="text-lg px-8 py-6 rounded-full border-2 border-blue-600 text-blue-600 hover:bg-blue-50"
