@@ -85,9 +85,9 @@ const AdminLogin = ({ onLogin }) => {
                 </div>
               </div>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
-                <p className="font-medium">بيانات الدخول للتجربة:</p>
+                <p className="font-medium">بيانات الدخول:</p>
                 <p>Username: <code className="bg-white px-2 py-1 rounded">admin</code></p>
-                <p>Password: <code className="bg-white px-2 py-1 rounded">admin123</code></p>
+                <p>Password: <code className="bg-white px-2 py-1 rounded">YourNewPassword@2025</code></p>
               </div>
               <Button 
                 type="submit" 
