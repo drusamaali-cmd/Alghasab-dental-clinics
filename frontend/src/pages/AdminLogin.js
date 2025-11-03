@@ -16,7 +16,8 @@ const AdminLogin = ({ onLogin }) => {
     e.preventDefault();
     
     // Simple admin authentication (replace with real auth)
-    if (username === 'admin' && password === 'admin123') {
+    // غيّر كلمة المرور هنا:
+    if (username === 'admin' && password === 'YourNewPassword@2025') {
       const adminUser = {
         id: 'admin-1',
         name: 'مدير النظام',
