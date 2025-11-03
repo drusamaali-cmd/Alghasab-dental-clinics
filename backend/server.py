@@ -497,12 +497,14 @@ async def create_appointment(appointment: AppointmentCreate):
     return appointment_obj
 
 @api_router.get("/appointments", response_model=List[Appointment])
-async def get_appointments(status: Optional[str] = None, patient_id: Optional[str] = None):
+async def get_appointments(status: Optional[str] = None, patient_id: Optional[str] = None, patient_phone: Optional[str] = None):
     query = {}
     if status:
         query["status"] = status
     if patient_id:
         query["patient_id"] = patient_id
+    if patient_phone:
+        query["patient_phone"] = patient_phone
     
     appointments = await db.appointments.find(query, {"_id": 0}).to_list(1000)
     for apt in appointments:
