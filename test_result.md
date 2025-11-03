@@ -153,6 +153,48 @@ frontend:
         - working: true
           agent: "user"
           comment: "Frontend displays appointments correctly. Patient can see confirmed appointments when they open the app."
+  
+  - task: "Landing page - Update happy patients count to 30,000"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/LandingPage.js"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Updated happy patients count from 10,000+ to 30,000+ in landing page statistics section (line 119)."
+  
+  - task: "Landing page - Fix 'Learn More' button scroll"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/LandingPage.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "User reported 'Learn More' button does not work on landing page."
+        - working: "NA"
+          agent: "main"
+          comment: "FIXED: Changed from getElementById to useRef for better React integration. Button now smoothly scrolls to features section when clicked. Uses featuresRef with scrollIntoView behavior."
+  
+  - task: "Google Maps review integration for completed appointments"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/PatientDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "Service rating feature mentioned in landing page but not implemented. User wants real Google Maps review integration."
+        - working: "NA"
+          agent: "main"
+          comment: "IMPLEMENTED: Added Google Maps review button for completed appointments. When appointment status is 'completed', a green button appears that opens Google Maps review page (https://maps.app.goo.gl/qiCBGYcxLRaPLRN77) in new tab. Button has star icon and attractive styling."
 
 metadata:
   created_by: "main_agent"
