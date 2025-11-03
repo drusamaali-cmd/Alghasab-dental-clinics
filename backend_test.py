@@ -373,8 +373,11 @@ def test_appointment_linking_by_phone():
     print("\n3️⃣ Querying appointments by phone number...")
     
     try:
+        # URL encode the phone number properly
+        import urllib.parse
+        encoded_phone = urllib.parse.quote(test_phone)
         query_response = requests.get(
-            f"{BACKEND_URL}/appointments?patient_phone={test_phone}",
+            f"{BACKEND_URL}/appointments?patient_phone={encoded_phone}",
             timeout=10
         )
         
