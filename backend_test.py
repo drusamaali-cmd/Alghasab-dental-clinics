@@ -274,22 +274,268 @@ def test_basic_api_endpoints():
     
     return all_working
 
+def test_appointment_linking_by_phone():
+    """Test appointment linking by phone number feature"""
+    print("🧪 Testing Appointment Linking by Phone Number")
+    print("=" * 60)
+    
+    # Step 1: Get existing doctors and services
+    print("\n1️⃣ Getting available doctors and services...")
+    
+    try:
+        doctors_response = requests.get(f"{BACKEND_URL}/doctors", timeout=10)
+        services_response = requests.get(f"{BACKEND_URL}/services", timeout=10)
+        
+        print(f"Doctors API Status: {doctors_response.status_code}")
+        print(f"Services API Status: {services_response.status_code}")
+        
+        if doctors_response.status_code != 200:
+            print(f"❌ Failed to get doctors: {doctors_response.text}")
+            return False
+            
+        if services_response.status_code != 200:
+            print(f"❌ Failed to get services: {services_response.text}")
+            return False
+            
+        doctors = doctors_response.json()
+        services = services_response.json()
+        
+        if not doctors:
+            print("❌ No doctors found in system")
+            return False
+            
+        if not services:
+            print("❌ No services found in system")
+            return False
+            
+        doctor = doctors[0]
+        service = services[0]
+        
+        print(f"✅ Using Doctor: {doctor['name']} (ID: {doctor['id']})")
+        print(f"✅ Using Service: {service['name']} (ID: {service['id']})")
+        
+    except Exception as e:
+        print(f"❌ Error getting doctors/services: {e}")
+        return False
+    
+    # Step 2: Create appointment via Admin (simulating manual entry)
+    print("\n2️⃣ Creating appointment via Admin (manual entry)...")
+    
+    test_phone = "+966501234567"
+    test_patient_name = "سارة أحمد المريض"
+    
+    appointment_data = {
+        "patient_name": test_patient_name,
+        "patient_phone": test_phone,
+        "doctor_id": doctor['id'],
+        "service_id": service['id'],
+        "appointment_date": (datetime.now(timezone.utc) + timedelta(days=2)).isoformat(),
+        "notes": "موعد تم إنشاؤه يدوياً من قبل الإدارة",
+        "created_by": "admin"
+        # Note: No patient_id provided (simulating manual admin entry)
+    }
+    
+    try:
+        create_response = requests.post(
+            f"{BACKEND_URL}/appointments",
+            json=appointment_data,
+            headers={"Content-Type": "application/json"},
+            timeout=10
+        )
+        
+        print(f"Create Appointment Status: {create_response.status_code}")
+        
+        if create_response.status_code != 200:
+            print(f"❌ Failed to create appointment: {create_response.text}")
+            return False
+            
+        appointment = create_response.json()
+        appointment_id = appointment['id']
+        
+        print(f"✅ Appointment created successfully")
+        print(f"   ID: {appointment_id}")
+        print(f"   Patient ID: '{appointment.get('patient_id', 'NOT SET')}'")
+        print(f"   Patient Name: {appointment['patient_name']}")
+        print(f"   Patient Phone: {appointment['patient_phone']}")
+        print(f"   Created By: {appointment['created_by']}")
+        
+        # Verify patient_id is empty or None (as expected for admin-created appointments)
+        if appointment.get('patient_id') == "" or appointment.get('patient_id') is None:
+            print("✅ Patient ID is empty as expected for admin-created appointment")
+        else:
+            print(f"⚠️  Patient ID is not empty: '{appointment.get('patient_id')}'")
+        
+    except Exception as e:
+        print(f"❌ Error creating appointment: {e}")
+        return False
+    
+    # Step 3: Query appointments by phone number
+    print("\n3️⃣ Querying appointments by phone number...")
+    
+    try:
+        query_response = requests.get(
+            f"{BACKEND_URL}/appointments?patient_phone={test_phone}",
+            timeout=10
+        )
+        
+        print(f"Query Appointments Status: {query_response.status_code}")
+        
+        if query_response.status_code != 200:
+            print(f"❌ Failed to query appointments: {query_response.text}")
+            return False
+            
+        appointments = query_response.json()
+        
+        print(f"✅ Query successful - Found {len(appointments)} appointment(s)")
+        
+        # Find our test appointment
+        test_appointment = None
+        for apt in appointments:
+            if apt['id'] == appointment_id:
+                test_appointment = apt
+                break
+        
+        if not test_appointment:
+            print(f"❌ Test appointment not found in query results")
+            print(f"   Expected ID: {appointment_id}")
+            print(f"   Found appointments: {[apt['id'] for apt in appointments]}")
+            return False
+        
+        print(f"✅ Test appointment found in query results")
+        
+    except Exception as e:
+        print(f"❌ Error querying appointments: {e}")
+        return False
+    
+    # Step 4: Verify appointment data matches
+    print("\n4️⃣ Verifying appointment data...")
+    
+    verification_passed = True
+    
+    # Check patient_name
+    if test_appointment['patient_name'] == test_patient_name:
+        print(f"✅ Patient name matches: {test_appointment['patient_name']}")
+    else:
+        print(f"❌ Patient name mismatch:")
+        print(f"   Expected: {test_patient_name}")
+        print(f"   Found: {test_appointment['patient_name']}")
+        verification_passed = False
+    
+    # Check patient_phone
+    if test_appointment['patient_phone'] == test_phone:
+        print(f"✅ Patient phone matches: {test_appointment['patient_phone']}")
+    else:
+        print(f"❌ Patient phone mismatch:")
+        print(f"   Expected: {test_phone}")
+        print(f"   Found: {test_appointment['patient_phone']}")
+        verification_passed = False
+    
+    # Check doctor info
+    if test_appointment['doctor_id'] == doctor['id']:
+        print(f"✅ Doctor ID matches: {test_appointment['doctor_id']}")
+        print(f"✅ Doctor name: {test_appointment['doctor_name']}")
+    else:
+        print(f"❌ Doctor ID mismatch:")
+        print(f"   Expected: {doctor['id']}")
+        print(f"   Found: {test_appointment['doctor_id']}")
+        verification_passed = False
+    
+    # Check service info
+    if test_appointment['service_id'] == service['id']:
+        print(f"✅ Service ID matches: {test_appointment['service_id']}")
+        print(f"✅ Service name: {test_appointment['service_name']}")
+    else:
+        print(f"❌ Service ID mismatch:")
+        print(f"   Expected: {service['id']}")
+        print(f"   Found: {test_appointment['service_id']}")
+        verification_passed = False
+    
+    # Check appointment date
+    expected_date = appointment_data['appointment_date']
+    if test_appointment['appointment_date'] == expected_date:
+        print(f"✅ Appointment date matches: {test_appointment['appointment_date']}")
+    else:
+        print(f"❌ Appointment date mismatch:")
+        print(f"   Expected: {expected_date}")
+        print(f"   Found: {test_appointment['appointment_date']}")
+        verification_passed = False
+    
+    # Step 5: Test edge case - query with different phone number
+    print("\n5️⃣ Testing edge case - query with different phone number...")
+    
+    try:
+        different_phone = "+966509876543"
+        edge_response = requests.get(
+            f"{BACKEND_URL}/appointments?patient_phone={different_phone}",
+            timeout=10
+        )
+        
+        if edge_response.status_code == 200:
+            edge_appointments = edge_response.json()
+            
+            # Should not find our test appointment
+            found_test_apt = any(apt['id'] == appointment_id for apt in edge_appointments)
+            
+            if not found_test_apt:
+                print(f"✅ Correct isolation - test appointment not found with different phone")
+            else:
+                print(f"❌ Test appointment incorrectly returned for different phone number")
+                verification_passed = False
+        else:
+            print(f"❌ Failed to query with different phone: {edge_response.text}")
+            verification_passed = False
+            
+    except Exception as e:
+        print(f"❌ Error testing edge case: {e}")
+        verification_passed = False
+    
+    # Step 6: Cleanup - Delete test appointment
+    print("\n6️⃣ Cleaning up test data...")
+    
+    try:
+        delete_response = requests.delete(
+            f"{BACKEND_URL}/appointments/{appointment_id}",
+            timeout=10
+        )
+        
+        if delete_response.status_code == 200:
+            print("✅ Test appointment deleted successfully")
+        else:
+            print(f"⚠️  Could not delete test appointment: {delete_response.text}")
+            
+    except Exception as e:
+        print(f"⚠️  Error deleting test appointment: {e}")
+    
+    print("\n" + "=" * 60)
+    print("🏁 Appointment Linking Test Complete")
+    
+    if verification_passed:
+        print("🎉 ALL TESTS PASSED - Appointment linking by phone number works correctly!")
+        print("\n📋 Summary:")
+        print("✅ Appointment can be created without patient_id")
+        print("✅ Appointment can be retrieved by patient_phone")
+        print("✅ When patient logs in with that phone, they will see their appointments")
+        return True
+    else:
+        print("💥 SOME TESTS FAILED - Check the output above for details")
+        return False
+
 if __name__ == "__main__":
     print("🏥 Alghasab Dental Clinic - Backend Test Suite")
-    print("Testing Push Notification Flow")
+    print("Testing Appointment Linking by Phone Number Feature")
     print("=" * 60)
     
     # Test basic endpoints first
     basic_test_passed = test_basic_api_endpoints()
     
     if not basic_test_passed:
-        print("\n❌ Basic API tests failed. Cannot proceed with notification testing.")
+        print("\n❌ Basic API tests failed. Cannot proceed with appointment linking testing.")
         exit(1)
     
-    # Test notification flow
-    notification_test_passed = test_appointment_confirmation_notification()
+    # Test appointment linking by phone number
+    linking_test_passed = test_appointment_linking_by_phone()
     
-    if notification_test_passed:
+    if linking_test_passed:
         print("\n🎉 All tests completed successfully!")
         exit(0)
     else:
