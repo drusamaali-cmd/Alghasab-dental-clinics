@@ -112,7 +112,7 @@ async def send_reminder_notification(appointment: dict, title: str, message: str
                 "included_segments": ["All"],
                 "headings": {"en": title, "ar": title},
                 "contents": {"en": message, "ar": message},
-                "url": "https://dental-booking-app.preview.emergentagent.com/patient/dashboard"
+                "url": "https://dental-booking-16.preview.emergentagent.com/patient/dashboard"
             }
             
             response = await client.post(
@@ -681,7 +681,7 @@ async def update_appointment(appointment_id: str, update: AppointmentUpdate):
                             "en": f"موعدك مع د. {apt['doctor_name']}\n{formatted_date}\n\nنتطلع لرؤيتك 🦷",
                             "ar": f"موعدك مع د. {apt['doctor_name']}\n{formatted_date}\n\nنتطلع لرؤيتك 🦷"
                         },
-                        "url": "https://dental-booking-app.preview.emergentagent.com/patient/dashboard"
+                        "url": "https://dental-booking-16.preview.emergentagent.com/patient/dashboard"
                     }
                     
                     response = await client.post(
@@ -776,7 +776,7 @@ async def send_campaign(campaign_id: str, max_recipients: Optional[int] = None, 
                 "included_segments": ["All"],
                 "headings": {"en": campaign['title'], "ar": campaign['title']},
                 "contents": {"en": campaign['message'], "ar": campaign['message']},
-                "url": "https://dental-booking-app.preview.emergentagent.com/patient/dashboard"
+                "url": "https://dental-booking-16.preview.emergentagent.com/patient/dashboard"
             }
             
             response = await client.post(

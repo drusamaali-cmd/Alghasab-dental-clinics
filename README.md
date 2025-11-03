@@ -8,7 +8,7 @@
 
 ## 📲 **التطبيقات المتاحة:**
 
-- 🌐 **Web App (PWA)**: https://dental-booking-app.preview.emergentagent.com
+- 🌐 **Web App (PWA)**: https://dental-booking-16.preview.emergentagent.com
 - 🤖 **Android App**: جاهز للنشر على Google Play Store
 - 🍎 **iOS App**: جاهز للنشر على Apple App Store
 
@@ -136,17 +136,17 @@ npx cap open ios
 
 ### **Admin:**
 ```
-https://dental-booking-app.preview.emergentagent.com/admin/login
+https://dental-booking-16.preview.emergentagent.com/admin/login
 ```
 
 ### **Patient:**
 ```
-https://dental-booking-app.preview.emergentagent.com/patient/login
+https://dental-booking-16.preview.emergentagent.com/patient/login
 ```
 
 ### **Landing:**
 ```
-https://dental-booking-app.preview.emergentagent.com
+https://dental-booking-16.preview.emergentagent.com
 ```
 
 ---

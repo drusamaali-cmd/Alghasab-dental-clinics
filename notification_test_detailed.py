@@ -8,7 +8,7 @@ import json
 from datetime import datetime, timezone, timedelta
 import uuid
 
-BACKEND_URL = "https://dental-booking-app.preview.emergentagent.com/api"
+BACKEND_URL = "https://dental-booking-16.preview.emergentagent.com/api"
 
 def test_notification_with_empty_patient_id():
     """Test notification when patient_id is empty (current issue)"""

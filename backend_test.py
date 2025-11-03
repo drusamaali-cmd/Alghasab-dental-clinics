@@ -11,7 +11,7 @@ from datetime import datetime, timezone, timedelta
 import uuid
 
 # Configuration
-BACKEND_URL = "https://dental-booking-app.preview.emergentagent.com/api"
+BACKEND_URL = "https://dental-booking-16.preview.emergentagent.com/api"
 
 def test_appointment_confirmation_notification():
     """Test the complete appointment confirmation notification flow"""
