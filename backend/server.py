@@ -231,6 +231,56 @@ async def send_notification(user_id: str, title: str, message: str, notification
     # TODO: Integrate with Firebase Cloud Messaging
     return notification
 
+# Admin Auth Models
+class AdminLogin(BaseModel):
+    username: str
+    password: str
+
+class AdminUser(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    username: str
+    password_hash: str
+    name: str
+    role: UserRole = UserRole.ADMIN
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+# Helper function to verify password
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)
+
+def hash_password(password: str) -> str:
+    return pwd_context.hash(password)
+
+# Admin Auth Routes
+@api_router.post("/auth/admin/login")
+async def admin_login(login_data: AdminLogin):
+    """Admin login with username and password"""
+    admin = await db.admin_users.find_one({"username": login_data.username}, {"_id": 0})
+    
+    if not admin:
+        raise HTTPException(status_code=401, detail="اسم المستخدم أو كلمة المرور غير صحيحة")
+    
+    if not verify_password(login_data.password, admin['password_hash']):
+        raise HTTPException(status_code=401, detail="اسم المستخدم أو كلمة المرور غير صحيحة")
+    
+    # Create token
+    token = create_access_token({
+        "user_id": admin['id'],
+        "username": admin['username'],
+        "role": admin['role']
+    })
+    
+    return {
+        "token": token,
+        "user": {
+            "id": admin['id'],
+            "name": admin['name'],
+            "role": admin['role'],
+            "username": admin['username']
+        }
+    }
+
 # Auth Routes
 @api_router.post("/auth/send-otp")
 async def send_otp(user_data: UserCreate):
