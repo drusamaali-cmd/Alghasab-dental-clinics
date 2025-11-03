@@ -188,7 +188,7 @@ const AdminDashboard = ({ user, onLogout }) => {
           <TabsContent value="campaigns" className="space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">الحملات التسويقية</h2>
-              <AddCampaignDialog 
+              <EnhancedCampaignDialog 
                 open={showAddCampaign} 
                 onOpenChange={setShowAddCampaign}
                 onSuccess={fetchData}
