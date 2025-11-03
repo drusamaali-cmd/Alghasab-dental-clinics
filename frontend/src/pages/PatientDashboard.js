@@ -136,7 +136,7 @@ const PatientDashboard = ({ user, onLogout }) => {
               <DialogHeader>
                 <DialogTitle>حجز موعد جديد</DialogTitle>
                 <DialogDescription>
-                  اختر الخدمة والطبيب والوقت المناسب
+                  اختر الخدمة والطبيب والتاريخ والفترة المناسبة، وسنتصل بك لتحديد الوقت الدقيق
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleBookAppointment} className="space-y-4">
@@ -167,14 +167,32 @@ const PatientDashboard = ({ user, onLogout }) => {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>التاريخ والوقت</Label>
+                  <Label>التاريخ المفضل</Label>
                   <Input 
-                    type="datetime-local" 
-                    value={newAppointment.appointment_date}
-                    onChange={(e) => setNewAppointment({...newAppointment, appointment_date: e.target.value})}
+                    type="date" 
+                    value={newAppointment.preferred_date}
+                    onChange={(e) => setNewAppointment({...newAppointment, preferred_date: e.target.value})}
                     required
-                    data-testid="datetime-input"
+                    min={new Date().toISOString().split('T')[0]}
+                    data-testid="date-input"
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label>الفترة المفضلة</Label>
+                  <Select value={newAppointment.preferred_time_period} onValueChange={(value) => setNewAppointment({...newAppointment, preferred_time_period: value})} required>
+                    <SelectTrigger data-testid="period-select">
+                      <SelectValue placeholder="اختر الفترة" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="morning">صباحاً (9 ص - 12 ظ)</SelectItem>
+                      <SelectItem value="evening">مساءً (4 م - 8 م)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <p className="text-sm text-blue-800">
+                    💡 سنتصل بك خلال 24 ساعة لتحديد الوقت الدقيق للموعد
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label>ملاحظات (اختياري)</Label>
@@ -186,7 +204,7 @@ const PatientDashboard = ({ user, onLogout }) => {
                   />
                 </div>
                 <DialogFooter>
-                  <Button type="submit" data-testid="submit-booking-btn">تأكيد الحجز</Button>
+                  <Button type="submit" data-testid="submit-booking-btn">إرسال طلب الحجز</Button>
                 </DialogFooter>
               </form>
             </DialogContent>
