@@ -17,6 +17,7 @@ import {
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import ChangePasswordDialog from '@/components/ChangePasswordDialog';
+import EnhancedCampaignDialog from '@/components/EnhancedCampaignDialog';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
