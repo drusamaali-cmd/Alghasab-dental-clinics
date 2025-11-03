@@ -9,7 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import axios from 'axios';
-import { Send, Users, Calendar, Star, Sparkles, Gift, TrendingUp } from 'lucide-react';
+import { Send, Users, Calendar, Star, Sparkles, Gift, TrendingUp, Bell } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
