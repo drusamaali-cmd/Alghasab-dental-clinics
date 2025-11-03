@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق عيادات الغصاب</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Tajawal', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 30px;
+            padding: 60px 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        .logo {
+            width: 200px;
+            height: auto;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #1e40af;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        .subtitle {
+            color: #6b7280;
+            font-size: 20px;
+            margin-bottom: 40px;
+        }
+        .features {
+            text-align: right;
+            margin-bottom: 40px;
+        }
+        .feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 18px;
+            color: #374151;
+        }
+        .feature::before {
+            content: "✓";
+            color: #10b981;
+            font-weight: bold;
+            font-size: 24px;
+            margin-left: 15px;
+        }
+        .link-box {
+            background: #f3f4f6;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            word-break: break-all;
+        }
+        .link {
+            color: #1e40af;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .qr-placeholder {
+            width: 200px;
+            height: 200px;
+            background: #e5e7eb;
+            margin: 0 auto 20px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        .cta {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+            padding: 20px 50px;
+            border-radius: 50px;
+            font-size: 22px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+        .footer {
+            margin-top: 30px;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <img src="logo.png" alt="عيادات الغصاب" class="logo">
+        
+        <h1>تطبيقنا الجديد متاح الآن!</h1>
+        <p class="subtitle">احجز موعدك بكل سهولة</p>
+        
+        <div class="features">
+            <div class="feature">حجز سريع وآمن على مدار الساعة</div>
+            <div class="feature">اختر طبيبك والخدمة المناسبة</div>
+            <div class="feature">تذكيرات تلقائية قبل موعدك</div>
+            <div class="feature">متابعة سجل مواعيدك بسهولة</div>
+        </div>
+        
+        <div class="qr-placeholder">
+            امسح QR Code للدخول السريع
+        </div>
+        
+        <div class="link-box">
+            <div style="margin-bottom: 10px; color: #6b7280;">أو ادخل على الرابط:</div>
+            <div class="link">smartsmile-app.preview.emergentagent.com</div>
+        </div>
+        
+        <a href="https://smartsmile-app.preview.emergentagent.com/patient/login" class="cta">
+            سجل الآن
+        </a>
+        
+        <div class="footer">
+            عيادات الغصاب لطب الأسنان<br>
+            للاستفسار: 0501234567
+        </div>
+    </div>
+</body>
+</html>
