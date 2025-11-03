@@ -228,6 +228,8 @@ const StatsCard = ({ icon, title, value, color }) => {
 
 // Appointments Table
 const AppointmentsTable = ({ appointments, onUpdate }) => {
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  
   const handleStatusChange = async (id, status) => {
     try {
       await axios.put(`${API}/appointments/${id}`, { status });
