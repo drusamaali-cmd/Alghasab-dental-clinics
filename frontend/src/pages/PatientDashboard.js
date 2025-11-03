@@ -38,7 +38,7 @@ const PatientDashboard = ({ user, onLogout }) => {
   const fetchData = async () => {
     try {
       const [appointmentsRes, doctorsRes, servicesRes, notificationsRes] = await Promise.all([
-        axios.get(`${API}/appointments?patient_id=${user.id}`),
+        axios.get(`${API}/appointments?patient_phone=${user.phone}`),
         axios.get(`${API}/doctors`),
         axios.get(`${API}/services`),
         axios.get(`${API}/notifications?user_id=${user.id}`)
