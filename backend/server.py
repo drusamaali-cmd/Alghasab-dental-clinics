@@ -642,16 +642,52 @@ async def send_campaign(campaign_id: str, background_tasks: BackgroundTasks):
     if not campaign:
         raise HTTPException(status_code=404, detail="Campaign not found")
     
-    # Get target users
-    query = {"role": "patient"}
-    if campaign.get('target_filter'):
-        # Apply filters (simplified for now)
-        pass
+    # Send push notification to ALL subscribed users via OneSignal
+    try:
+        async with httpx.AsyncClient() as client:
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Basic {ONESIGNAL_REST_API_KEY}"
+            }
+            
+            # إرسال لجميع المشتركين
+            payload = {
+                "app_id": ONESIGNAL_APP_ID,
+                "included_segments": ["All"],  # جميع المشتركين
+                "headings": {"en": campaign['title'], "ar": campaign['title']},
+                "contents": {"en": campaign['message'], "ar": campaign['message']},
+                "url": "https://smartsmile-app.preview.emergentagent.com/patient/dashboard"
+            }
+            
+            response = await client.post(
+                "https://onesignal.com/api/v1/notifications",
+                headers=headers,
+                json=payload,
+                timeout=10.0
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                sent_count = result.get('recipients', 0)
+                print(f"✅ Campaign sent to {sent_count} users")
+                
+                # Update campaign status
+                await db.campaigns.update_one(
+                    {"id": campaign_id},
+                    {"$set": {"status": "sent", "sent_count": sent_count}}
+                )
+                
+                return {"message": f"تم إرسال الحملة إلى {sent_count} مراجع"}
+            else:
+                print(f"❌ Failed to send campaign: {response.text}")
+                raise HTTPException(status_code=500, detail="فشل إرسال الحملة")
+                
+    except Exception as e:
+        print(f"Error sending campaign: {e}")
+        raise HTTPException(status_code=500, detail=f"خطأ في إرسال الحملة: {str(e)}")
     
-    users = await db.users.find(query, {"_id": 0}).to_list(10000)
-    
-    # Send notifications to all users
-    sent_count = 0
+    # Also save to database notifications (backup)
+    users = await db.users.find({"role": "patient"}, {"_id": 0}).to_list(10000)
     for user in users:
         await send_notification(
             user['id'],
@@ -659,15 +695,8 @@ async def send_campaign(campaign_id: str, background_tasks: BackgroundTasks):
             campaign['message'],
             "campaign"
         )
-        sent_count += 1
     
-    # Update campaign status
-    await db.campaigns.update_one(
-        {"id": campaign_id},
-        {"$set": {"status": "sent", "sent_count": sent_count}}
-    )
-    
-    return {"message": f"Campaign sent to {sent_count} users"}
+    return {"message": f"تم إرسال الحملة بنجاح"}
 
 # Notification Routes
 @api_router.get("/notifications", response_model=List[Notification])
