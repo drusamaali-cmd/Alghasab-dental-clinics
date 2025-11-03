@@ -234,12 +234,46 @@ const PatientDashboard = ({ user, onLogout }) => {
               </Card>
             ) : (
               notifications.map(notif => (
-                <Card key={notif.id} className={notif.read ? 'opacity-60' : ''}>
+                <Card 
+                  key={notif.id} 
+                  className={`cursor-pointer hover:shadow-md transition-all ${notif.read ? 'opacity-60' : ''}`}
+                  onClick={() => {
+                    if (notif.type === 'campaign' || notif.type === 'reminder') {
+                      setShowBookDialog(true);
+                    }
+                    // Mark as read
+                    axios.put(`${API}/notifications/${notif.id}/read`);
+                  }}
+                >
                   <CardHeader>
-                    <CardTitle className="text-lg">{notif.title}</CardTitle>
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Bell className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div className="flex-1">
+                        <CardTitle className="text-lg">{notif.title}</CardTitle>
+                        <p className="text-sm text-gray-500 mt-1">
+                          {format(new Date(notif.created_at), 'PPp', { locale: ar })}
+                        </p>
+                      </div>
+                      {!notif.read && (
+                        <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                      )}
+                    </div>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-600">{notif.message}</p>
+                    <p className="text-gray-600 whitespace-pre-wrap">{notif.message}</p>
+                    {(notif.type === 'campaign' || notif.type === 'reminder') && (
+                      <Button 
+                        className="mt-4 w-full bg-gradient-to-r from-blue-600 to-blue-700"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowBookDialog(true);
+                        }}
+                      >
+                        احجز الآن
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
               ))
