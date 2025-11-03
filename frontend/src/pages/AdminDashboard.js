@@ -325,6 +325,66 @@ const AppointmentsTable = ({ appointments, onUpdate }) => {
           </tbody>
         </table>
       </div>
+      
+      {/* Dialog for full appointment details */}
+      {selectedAppointment && (
+        <Dialog open={!!selectedAppointment} onOpenChange={() => setSelectedAppointment(null)}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>تفاصيل الموعد</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-600">المراجع</Label>
+                  <p className="font-medium text-lg">{selectedAppointment.patient_name}</p>
+                  <p className="text-sm text-gray-600">{selectedAppointment.patient_phone}</p>
+                </div>
+                <div>
+                  <Label className="text-gray-600">الطبيب</Label>
+                  <p className="font-medium text-lg">د. {selectedAppointment.doctor_name}</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-600">الخدمة</Label>
+                  <p className="font-medium">{selectedAppointment.service_name}</p>
+                </div>
+                <div>
+                  <Label className="text-gray-600">التاريخ والوقت</Label>
+                  <p className="font-medium">
+                    {format(new Date(selectedAppointment.appointment_date), 'PPPp', { locale: ar })}
+                  </p>
+                </div>
+              </div>
+              
+              <div>
+                <Label className="text-gray-600">الحالة</Label>
+                <p>
+                  <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${statusColors[selectedAppointment.status]}`}>
+                    {statusLabels[selectedAppointment.status]}
+                  </span>
+                </p>
+              </div>
+              
+              {selectedAppointment.notes && (
+                <div>
+                  <Label className="text-gray-600">الملاحظات</Label>
+                  <div className="mt-2 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <p className="text-gray-800 whitespace-pre-wrap">{selectedAppointment.notes}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setSelectedAppointment(null)}>
+                إغلاق
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
