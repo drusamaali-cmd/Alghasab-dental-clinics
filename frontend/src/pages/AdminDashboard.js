@@ -429,6 +429,61 @@ const AppointmentsTable = ({ appointments, onUpdate }) => {
           </DialogContent>
         </Dialog>
       )}
+      
+      {/* Dialog for editing appointment */}
+      {editingAppointment && (
+        <Dialog open={!!editingAppointment} onOpenChange={() => setEditingAppointment(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>تعديل موعد {editingAppointment.patient_name}</DialogTitle>
+              <DialogDescription>
+                حدد التاريخ والوقت الدقيق للموعد بعد الاتفاق مع المراجع
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-sm text-blue-800">
+                  <strong>الفترة المفضلة للمراجع:</strong> {editingAppointment.notes?.includes('صباحاً') ? 'صباحاً ☀️' : editingAppointment.notes?.includes('مساءً') ? 'مساءً 🌙' : 'غير محددة'}
+                </p>
+              </div>
+              
+              <div className="space-y-2">
+                <Label>التاريخ</Label>
+                <Input 
+                  type="date"
+                  value={editForm.appointment_date}
+                  onChange={(e) => setEditForm({...editForm, appointment_date: e.target.value})}
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label>الوقت</Label>
+                <Input 
+                  type="time"
+                  value={editForm.appointment_time}
+                  onChange={(e) => setEditForm({...editForm, appointment_time: e.target.value})}
+                  required
+                />
+              </div>
+              
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <p className="text-sm text-amber-800">
+                  💡 بعد الحفظ، غيّر حالة الموعد إلى "مؤكد" لإرسال إشعار للمراجع
+                </p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEditingAppointment(null)}>
+                إلغاء
+              </Button>
+              <Button onClick={handleSaveEdit}>
+                حفظ التعديلات
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
