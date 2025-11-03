@@ -468,8 +468,9 @@ def test_appointment_linking_by_phone():
     
     try:
         different_phone = "+966509876543"
+        encoded_different_phone = urllib.parse.quote(different_phone)
         edge_response = requests.get(
-            f"{BACKEND_URL}/appointments?patient_phone={different_phone}",
+            f"{BACKEND_URL}/appointments?patient_phone={encoded_different_phone}",
             timeout=10
         )
         
