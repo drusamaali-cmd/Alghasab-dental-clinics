@@ -40,6 +40,95 @@ ALGORITHM = "HS256"
 ONESIGNAL_APP_ID = "3adbb1be-a764-4977-a22c-0de12043ac2e"
 ONESIGNAL_REST_API_KEY = os.environ.get("ONESIGNAL_REST_API_KEY", "")  # سنحتاجه لاحقاً
 
+# Scheduler for automatic reminders
+scheduler = AsyncIOScheduler()
+
+# Function to send automatic reminders
+async def send_automatic_reminders():
+    """
+    Check for appointments and send reminders:
+    - 24 hours before appointment
+    - 3 hours before appointment
+    """
+    try:
+        now = datetime.now(timezone.utc)
+        
+        # Get all confirmed appointments
+        appointments = await db.appointments.find({"status": "confirmed"}, {"_id": 0}).to_list(1000)
+        
+        for apt in appointments:
+            # Parse appointment date
+            apt_date = datetime.fromisoformat(apt['appointment_date']) if isinstance(apt['appointment_date'], str) else apt['appointment_date']
+            
+            # Make sure apt_date is timezone-aware
+            if apt_date.tzinfo is None:
+                apt_date = apt_date.replace(tzinfo=timezone.utc)
+            
+            time_until_appointment = apt_date - now
+            hours_until = time_until_appointment.total_seconds() / 3600
+            
+            # 24-hour reminder (send if between 24h and 23h before appointment)
+            if 23 <= hours_until <= 24 and not apt.get('reminder_24h_sent', False):
+                await send_reminder_notification(
+                    apt, 
+                    "تذكير: موعدك غداً 📅",
+                    f"موعدك مع د. {apt['doctor_name']} غداً في تمام الساعة {apt_date.strftime('%I:%M %p')}\n\nنتطلع لرؤيتك 🦷"
+                )
+                # Mark as sent
+                await db.appointments.update_one(
+                    {"id": apt['id']},
+                    {"$set": {"reminder_24h_sent": True}}
+                )
+                print(f"✅ Sent 24h reminder for appointment {apt['id']}")
+            
+            # 3-hour reminder (send if between 3h and 2.5h before appointment)
+            elif 2.5 <= hours_until <= 3 and not apt.get('reminder_3h_sent', False):
+                await send_reminder_notification(
+                    apt,
+                    "تذكير: موعدك بعد 3 ساعات ⏰",
+                    f"موعدك مع د. {apt['doctor_name']} بعد 3 ساعات\n📍 عيادات الغصاب\n⏰ {apt_date.strftime('%I:%M %p')}\n\nنراك قريباً 😊"
+                )
+                # Mark as sent
+                await db.appointments.update_one(
+                    {"id": apt['id']},
+                    {"$set": {"reminder_3h_sent": True}}
+                )
+                print(f"✅ Sent 3h reminder for appointment {apt['id']}")
+    
+    except Exception as e:
+        print(f"❌ Error in automatic reminders: {e}")
+
+async def send_reminder_notification(appointment: dict, title: str, message: str):
+    """Send reminder notification via OneSignal"""
+    try:
+        async with httpx.AsyncClient() as client:
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Basic {ONESIGNAL_REST_API_KEY}"
+            }
+            
+            payload = {
+                "app_id": ONESIGNAL_APP_ID,
+                "included_segments": ["All"],
+                "headings": {"en": title, "ar": title},
+                "contents": {"en": message, "ar": message},
+                "url": "https://dental-booking-app.preview.emergentagent.com/patient/dashboard"
+            }
+            
+            response = await client.post(
+                "https://onesignal.com/api/v1/notifications",
+                headers=headers,
+                json=payload,
+                timeout=10.0
+            )
+            
+            if response.status_code == 200:
+                print(f"✅ Reminder notification sent for {appointment.get('patient_phone', 'unknown')}")
+            else:
+                print(f"❌ Failed to send reminder: {response.text}")
+    except Exception as e:
+        print(f"❌ Error sending reminder notification: {e}")
+
 # Enums
 class UserRole(str, Enum):
     ADMIN = "admin"
