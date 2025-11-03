@@ -125,7 +125,7 @@ const LandingPage = () => {
             <StatItem number="30,000+" label="مراجع سعيد" />
             <StatItem number="15+" label="طبيب متخصص" />
             <StatItem number="20+" label="خدمة طبية" />
-            <StatItem number="4.9" label="تقييم العملاء" />
+            <StatItem number="4.7" label="تقييم العملاء" />
           </div>
         </div>
       </section>
