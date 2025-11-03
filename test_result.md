@@ -141,6 +141,21 @@ backend:
           agent: "testing"
           comment: "✅ FIX CONFIRMED WORKING: Tested complete appointment confirmation flow. Created appointment with empty patient_id but valid patient_phone (+966501234567), confirmed appointment, and verified OneSignal push notification was sent successfully. Backend logs show '✅ Confirmation push notification sent for patient: +966501234567'. OneSignal API returns 200 status. The fix at line 559 (checking patient_phone instead of patient_id) is working correctly for ALL appointments."
 
+  - task: "Appointment linking by phone number feature"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "IMPLEMENTED: Updated backend GET /api/appointments endpoint to accept patient_phone parameter (line 500-507). Frontend PatientDashboard changed from patient_id to patient_phone query (line 41). This allows patients to see appointments created by admin even when patient_id is empty."
+        - working: true
+          agent: "testing"
+          comment: "✅ COMPREHENSIVE TESTING COMPLETED - ALL TESTS PASSED: 1) Admin can create appointments without patient_id (empty string) ✅ 2) Appointments can be retrieved by patient_phone parameter ✅ 3) Patient data verification (name, phone, doctor, service, date) all match ✅ 4) Edge case testing - different phone numbers correctly isolated ✅ 5) Frontend integration confirmed - PatientDashboard uses patient_phone query ✅. The appointment linking feature works perfectly: when admin adds appointment manually with patient name and phone, the patient can see their appointments when they login later with same phone number."
+
 frontend:
   - task: "Display confirmed appointments in patient dashboard"
     implemented: true
