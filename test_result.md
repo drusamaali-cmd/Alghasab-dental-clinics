@@ -202,6 +202,21 @@ frontend:
           agent: "testing"
           comment: "✅ TESTED AND WORKING: Google Maps review button appears correctly for completed appointments. Button has proper green gradient styling (from-green-600 to-green-700). Clicking opens Google Maps in new tab (URL redirects to full Google Maps page as expected). Button text 'قيّم زيارتك على Google Maps' displays correctly. Feature is fully functional."
 
+  - task: "NEW Google Maps review button placement - Always visible at top of Patient Dashboard"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/PatientDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "user"
+          comment: "User requested the review button to be more visible and accessible. Button was moved from 'completed appointments only' to the main dashboard, now appears next to 'Book Appointment' button at the top of Patient Dashboard."
+        - working: true
+          agent: "testing"
+          comment: "✅ COMPREHENSIVE TESTING COMPLETED - ALL 7/7 TESTS PASSED: 1) Google Maps Review button is prominently visible at top of Patient Dashboard next to Book Appointment button (lines 213-222). 2) Perfect green gradient styling (from-green-600 to-green-700 hover:from-green-700 hover:to-green-800). 3) Correct Arabic text 'قيّم زيارتك على Google Maps' with star icon. 4) Button opens correct Google Maps URL (https://maps.app.goo.gl/qiCBGYcxLRaPLRN77?g_st=aw) in new tab. 5) Always visible - no need for completed appointments. 6) Proper flex-wrap layout for responsive design. 7) Side-by-side positioning with Book Appointment button. The NEW placement implementation is PERFECT and meets all user requirements for improved visibility and accessibility."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
