@@ -557,6 +557,7 @@ async def update_appointment(appointment_id: str, update: AppointmentUpdate):
     # Send notification if status changed to confirmed
     if update.status == AppointmentStatus.CONFIRMED:
         if apt.get('patient_id'):
+            # Send in-app notification
             await send_notification(
                 apt['patient_id'],
                 "تم تأكيد موعدك",
@@ -564,6 +565,43 @@ async def update_appointment(appointment_id: str, update: AppointmentUpdate):
                 "reminder",
                 appointment_id
             )
+            
+            # Send push notification via OneSignal
+            try:
+                async with httpx.AsyncClient() as client:
+                    headers = {
+                        "Content-Type": "application/json",
+                        "Authorization": f"Basic {ONESIGNAL_REST_API_KEY}"
+                    }
+                    
+                    # Format date nicely
+                    apt_date = datetime.fromisoformat(apt['appointment_date']) if isinstance(apt['appointment_date'], str) else apt['appointment_date']
+                    formatted_date = apt_date.strftime('%A %d %B الساعة %I:%M %p')
+                    
+                    payload = {
+                        "app_id": ONESIGNAL_APP_ID,
+                        "included_segments": ["All"],
+                        "headings": {"en": "✅ تم تأكيد موعدك", "ar": "✅ تم تأكيد موعدك"},
+                        "contents": {
+                            "en": f"موعدك مع د. {apt['doctor_name']}\n{formatted_date}\n\nنتطلع لرؤيتك 🦷",
+                            "ar": f"موعدك مع د. {apt['doctor_name']}\n{formatted_date}\n\nنتطلع لرؤيتك 🦷"
+                        },
+                        "url": "https://smartsmile-app.preview.emergentagent.com/patient/dashboard"
+                    }
+                    
+                    response = await client.post(
+                        "https://onesignal.com/api/v1/notifications",
+                        headers=headers,
+                        json=payload,
+                        timeout=10.0
+                    )
+                    
+                    if response.status_code == 200:
+                        print(f"✅ Confirmation push notification sent")
+                    else:
+                        print(f"❌ Failed to send push notification: {response.text}")
+            except Exception as e:
+                print(f"Error sending OneSignal notification: {e}")
     
     return Appointment(**apt)
 
