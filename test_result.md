@@ -111,11 +111,11 @@ user_problem_statement: |
 backend:
   - task: "Send OneSignal push notification on appointment confirmation"
     implemented: true
-    working: false
+    working: "NA"
     file: "/app/backend/server.py"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: false
           agent: "user"
@@ -126,6 +126,9 @@ backend:
         - working: false
           agent: "testing"
           comment: "ROOT CAUSE IDENTIFIED: Line 559 checks 'if apt.get('patient_id'):' but patient_id is empty string ('') when appointments are created without patient_id. Empty string is falsy in Python, so notification code never executes. OneSignal API works correctly when patient_id has value. SOLUTION: Change condition to 'if apt.get('patient_phone'):' or ensure patient_id is properly set during appointment creation."
+        - working: "NA"
+          agent: "main"
+          comment: "FIXED: Changed condition from 'if apt.get('patient_id'):' to 'if apt.get('patient_phone'):' at line 559. Now OneSignal push notifications will be sent for ALL appointments when status changes to CONFIRMED, regardless of patient_id value. In-app notifications only sent if patient_id exists. Ready for retesting."
 
 frontend:
   - task: "Display confirmed appointments in patient dashboard"
