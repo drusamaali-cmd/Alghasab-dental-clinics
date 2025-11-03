@@ -161,3 +161,5 @@ agent_communication:
       message: "Starting investigation of appointment confirmation notifications. Will test the complete flow: create appointment -> confirm appointment -> verify OneSignal API call and notification delivery."
     - agent: "testing"
       message: "CRITICAL ISSUE FOUND: Appointment confirmation notifications fail because patient_id is empty string when appointments are created. The notification code at line 559 checks 'if apt.get('patient_id'):' which fails for empty strings. OneSignal API and configuration are working correctly. Fix needed in server.py line 559 to check patient_phone instead of patient_id, or ensure patient_id is properly populated during appointment creation."
+    - agent: "main"
+      message: "FIX APPLIED: Updated server.py line 559 to check 'patient_phone' instead of 'patient_id'. OneSignal push notifications will now be sent for all appointment confirmations. Backend hot reload will pick up the change automatically. Ready for testing."
