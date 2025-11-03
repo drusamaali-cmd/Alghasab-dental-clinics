@@ -262,6 +262,7 @@ const AppointmentsTable = ({ appointments, onUpdate }) => {
               <th className="px-6 py-4 text-right text-sm font-semibold text-gray-700">الطبيب</th>
               <th className="px-6 py-4 text-right text-sm font-semibold text-gray-700">الخدمة</th>
               <th className="px-6 py-4 text-right text-sm font-semibold text-gray-700">التاريخ</th>
+              <th className="px-6 py-4 text-right text-sm font-semibold text-gray-700">الملاحظات</th>
               <th className="px-6 py-4 text-right text-sm font-semibold text-gray-700">الحالة</th>
               <th className="px-6 py-4 text-right text-sm font-semibold text-gray-700">إجراءات</th>
             </tr>
@@ -279,6 +280,17 @@ const AppointmentsTable = ({ appointments, onUpdate }) => {
                 <td className="px-6 py-4 text-gray-900">{apt.service_name}</td>
                 <td className="px-6 py-4 text-gray-900">
                   {format(new Date(apt.appointment_date), 'PPp', { locale: ar })}
+                </td>
+                <td className="px-6 py-4">
+                  {apt.notes ? (
+                    <div className="max-w-xs">
+                      <p className="text-sm text-gray-700 line-clamp-2" title={apt.notes}>
+                        {apt.notes}
+                      </p>
+                    </div>
+                  ) : (
+                    <span className="text-sm text-gray-400">-</span>
+                  )}
                 </td>
                 <td className="px-6 py-4">
                   <Select value={apt.status} onValueChange={(value) => handleStatusChange(apt.id, value)}>
