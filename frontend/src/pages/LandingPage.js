@@ -122,7 +122,7 @@ const LandingPage = () => {
       <section className="bg-gradient-to-r from-blue-600 to-blue-700 py-16">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
-            <StatItem number="10,000+" label="مراجع سعيد" />
+            <StatItem number="30,000+" label="مراجع سعيد" />
             <StatItem number="15+" label="طبيب متخصص" />
             <StatItem number="20+" label="خدمة طبية" />
             <StatItem number="4.9" label="تقييم العملاء" />
