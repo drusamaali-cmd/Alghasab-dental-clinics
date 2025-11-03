@@ -286,6 +286,29 @@ async def admin_login(login_data: AdminLogin):
         }
     }
 
+@api_router.put("/admin/change-password")
+async def change_admin_password(change_data: ChangePasswordRequest):
+    """Change admin password"""
+    admin = await db.admin_users.find_one({"id": change_data.user_id}, {"_id": 0})
+    
+    if not admin:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    
+    # Verify current password
+    if not verify_password(change_data.current_password, admin['password_hash']):
+        raise HTTPException(status_code=401, detail="كلمة المرور الحالية غير صحيحة")
+    
+    # Hash new password
+    new_password_hash = hash_password(change_data.new_password)
+    
+    # Update password
+    await db.admin_users.update_one(
+        {"id": change_data.user_id},
+        {"$set": {"password_hash": new_password_hash}}
+    )
+    
+    return {"message": "تم تغيير كلمة المرور بنجاح"}
+
 # Auth Routes
 @api_router.post("/auth/send-otp")
 async def send_otp(user_data: UserCreate):
