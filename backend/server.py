@@ -236,6 +236,11 @@ class AdminLogin(BaseModel):
     username: str
     password: str
 
+class ChangePasswordRequest(BaseModel):
+    user_id: str
+    current_password: str
+    new_password: str
+
 class AdminUser(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
