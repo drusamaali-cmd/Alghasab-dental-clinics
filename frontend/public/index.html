@@ -13,7 +13,16 @@
           OneSignalDeferred.push(async function(OneSignal) {
             await OneSignal.init({
               appId: "3adbb1be-a764-4977-a22c-0de12043ac2e",
+              allowLocalhostAsSecureOrigin: true,
             });
+            
+            // Request permission automatically
+            try {
+              await OneSignal.Slidedown.promptPush();
+              console.log('OneSignal: Slidedown prompt shown');
+            } catch (error) {
+              console.log('OneSignal error:', error);
+            }
           });
         </script>
         <!-- End OneSignal -->
