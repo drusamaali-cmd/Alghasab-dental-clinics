@@ -73,6 +73,64 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* Medical Instructions Section */}
+      <section className="bg-gradient-to-r from-green-600 to-green-700 py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <h3 className="text-4xl font-bold text-center text-white mb-12">
+              تعليمات طبية مهمة
+            </h3>
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Before Treatment Card */}
+              <div className="bg-white rounded-2xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105">
+                <div className="flex items-center justify-center mb-6">
+                  <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-4xl">
+                    📋
+                  </div>
+                </div>
+                <h4 className="text-2xl font-bold text-gray-900 mb-4 text-center">
+                  قبل البدء بالعلاج
+                </h4>
+                <p className="text-gray-600 text-center mb-6 leading-relaxed">
+                  تعليمات مهمة يجب قراءتها قبل حضورك للعيادة لضمان أفضل نتائج العلاج
+                </p>
+                <div className="flex justify-center">
+                  <Button 
+                    onClick={() => navigate('/before-treatment')}
+                    className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl shadow-lg"
+                  >
+                    اعرض التعليمات
+                  </Button>
+                </div>
+              </div>
+
+              {/* After Treatment Card */}
+              <div className="bg-white rounded-2xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105">
+                <div className="flex items-center justify-center mb-6">
+                  <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center text-4xl">
+                    ✅
+                  </div>
+                </div>
+                <h4 className="text-2xl font-bold text-gray-900 mb-4 text-center">
+                  تعليمات ما بعد العلاج
+                </h4>
+                <p className="text-gray-600 text-center mb-6 leading-relaxed">
+                  تعليمات مفصلة حسب نوع العلاج للعناية بأسنانك بعد الإجراء الطبي
+                </p>
+                <div className="flex justify-center">
+                  <Button 
+                    onClick={() => navigate('/after-treatment')}
+                    className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-3 rounded-xl shadow-lg"
+                  >
+                    اعرض التعليمات
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section ref={featuresRef} className="container mx-auto px-4 py-20">
         <h3 className="text-4xl font-bold text-center text-gray-900 mb-16">
