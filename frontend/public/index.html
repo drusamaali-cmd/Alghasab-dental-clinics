@@ -6,47 +6,6 @@
         <meta name="theme-color" content="#000000" />
         <meta name="description" content="A product of emergent.sh" />
         
-        <!-- OneSignal Push Notifications -->
-        <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-        <script>
-          window.OneSignalDeferred = window.OneSignalDeferred || [];
-          OneSignalDeferred.push(async function(OneSignal) {
-            await OneSignal.init({
-              appId: "3adbb1be-a764-4977-a22c-0de12043ac2e",
-              allowLocalhostAsSecureOrigin: true,
-              notifyButton: {
-                enable: false,
-              },
-              promptOptions: {
-                slidedown: {
-                  enabled: true,
-                  autoPrompt: true,
-                  actionMessage: "نود إرسال إشعارات لك للتذكير بمواعيدك والعروض الخاصة",
-                  acceptButtonText: "السماح",
-                  cancelButtonText: "لا شكراً"
-                }
-              }
-            });
-            
-            // Show native prompt after a short delay
-            setTimeout(async () => {
-              try {
-                const permission = await OneSignal.Notifications.permission;
-                console.log('OneSignal permission status:', permission);
-                
-                if (permission === false) {
-                  // Not subscribed yet, show prompt
-                  await OneSignal.Slidedown.promptPush();
-                  console.log('OneSignal: Slidedown prompt shown');
-                }
-              } catch (error) {
-                console.log('OneSignal error:', error);
-              }
-            }, 3000); // Wait 3 seconds after page load
-          });
-        </script>
-        <!-- End OneSignal -->
-        
         <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
