@@ -115,6 +115,10 @@ user_problem_statement: |
   New Features Added:
   - Google Maps review button for completed appointments in Patient Dashboard
   - Smooth scroll to features section on landing page
+  - Medical Instructions Pages (NEW):
+    * Before Treatment Instructions page with QR code
+    * After Treatment Instructions page with 10 treatment types and QR codes
+    * Prominent section on Landing Page linking to both pages
 
 backend:
   - task: "Send OneSignal push notification on appointment confirmation"
