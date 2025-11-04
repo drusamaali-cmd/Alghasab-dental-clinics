@@ -10,6 +10,8 @@ import PatientLogin from '@/pages/PatientLogin';
 import PatientDashboard from '@/pages/PatientDashboard';
 import AdminLogin from '@/pages/AdminLogin';
 import AdminDashboard from '@/pages/AdminDashboard';
+import BeforeTreatmentInstructions from '@/pages/BeforeTreatmentInstructions';
+import AfterTreatmentInstructions from '@/pages/AfterTreatmentInstructions';
 
 function App() {
   const [user, setUser] = useState(null);
