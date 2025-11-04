@@ -12,9 +12,12 @@ import axios from 'axios';
 import { Calendar, Bell, Clock, Star, LogOut, User, Plus } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
+import { Capacitor } from '@capacitor/core';
+import OneSignal from 'onesignal-cordova-plugin';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
+const ONESIGNAL_APP_ID = "3adbb1be-a764-4977-a22c-0de12043ac2e";
 
 const PatientDashboard = ({ user, onLogout }) => {
   const [appointments, setAppointments] = useState([]);
