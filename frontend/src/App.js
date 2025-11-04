@@ -53,6 +53,8 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/before-treatment" element={<BeforeTreatmentInstructions />} />
+          <Route path="/after-treatment" element={<AfterTreatmentInstructions />} />
           <Route 
             path="/patient/login" 
             element={
