@@ -8,7 +8,7 @@ const BeforeTreatmentInstructions = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-green-600 to-green-700 shadow-lg">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4 space-x-reverse">
@@ -19,7 +19,7 @@ const BeforeTreatmentInstructions = () => {
               />
               <div>
                 <h1 className="text-2xl font-bold text-white">عيادات الغصاب لطب الأسنان</h1>
-                <p className="text-green-100 text-sm">Alghasab Dental Clinics</p>
+                <p className="text-blue-100 text-sm">Alghasab Dental Clinics</p>
               </div>
             </div>
             <button
