@@ -42,43 +42,50 @@ const PatientDashboard = ({ user, onLogout }) => {
   }, []);
 
   const checkNotificationPermission = async () => {
-    // Check if notifications are supported
-    if ('Notification' in window && window.OneSignal) {
+    // Check if running on native platform
+    if (Capacitor.isNativePlatform()) {
       try {
-        await window.OneSignal.init({
-          appId: "3adbb1be-a764-4977-a22c-0de12043ac2e"
-        });
+        // Initialize OneSignal for native
+        OneSignal.setAppId(ONESIGNAL_APP_ID);
         
-        const permission = await window.OneSignal.Notifications.permission;
-        setNotificationPermission(permission ? 'granted' : 'default');
-        
-        // Show prompt if not granted
-        if (!permission) {
-          setShowNotificationPrompt(true);
+        // Set external user ID (phone number)
+        if (user && user.phone) {
+          OneSignal.setExternalUserId(user.phone);
         }
+        
+        // Prompt for push notifications
+        OneSignal.promptForPushNotificationsWithUserResponse((accepted) => {
+          console.log("User accepted notifications: " + accepted);
+          setNotificationPermission(accepted ? 'granted' : 'denied');
+          setShowNotificationPrompt(!accepted);
+        });
       } catch (error) {
-        console.log('OneSignal check error:', error);
+        console.log('OneSignal native error:', error);
       }
+    } else {
+      // For web/browser (PWA)
+      console.log('Running in browser/PWA mode - notifications disabled in this version');
+      setShowNotificationPrompt(false);
     }
   };
 
   const handleEnableNotifications = async () => {
     try {
-      if (window.OneSignal) {
-        await window.OneSignal.Slidedown.promptPush();
-        
-        // Check permission after prompt
-        setTimeout(async () => {
-          const permission = await window.OneSignal.Notifications.permission;
-          if (permission) {
+      if (Capacitor.isNativePlatform()) {
+        // Prompt for push notifications on native
+        OneSignal.promptForPushNotificationsWithUserResponse((accepted) => {
+          if (accepted) {
             setNotificationPermission('granted');
             setShowNotificationPrompt(false);
             toast.success('تم تفعيل الإشعارات بنجاح! 🎉');
+          } else {
+            toast.error('تم رفض الإشعارات');
           }
-        }, 1000);
+        });
       }
     } catch (error) {
       console.log('Error enabling notifications:', error);
+      toast.error('حدث خطأ أثناء تفعيل الإشعارات');
     }
   };
 
