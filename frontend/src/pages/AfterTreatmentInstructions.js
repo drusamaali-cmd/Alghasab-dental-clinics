@@ -167,7 +167,7 @@ const AfterTreatmentInstructions = () => {
           <div>
             <button
               onClick={() => setSelectedTreatment(null)}
-              className="flex items-center space-x-2 space-x-reverse text-green-600 hover:text-green-700 font-medium mb-6 transition-colors"
+              className="flex items-center space-x-2 space-x-reverse text-blue-600 hover:text-blue-700 font-medium mb-6 transition-colors"
             >
               <ChevronLeft size={20} className="transform rotate-180" />
               <span>العودة لقائمة العلاجات</span>
