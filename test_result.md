@@ -315,11 +315,7 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "Medical Instructions - Before Treatment page"
-    - "Medical Instructions - After Treatment page"
-    - "Landing Page - Medical Instructions Section"
-    - "App.js - Routes for Medical Instructions"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
