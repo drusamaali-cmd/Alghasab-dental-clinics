@@ -86,11 +86,11 @@ const AfterTreatmentInstructions = () => {
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4 space-x-reverse">
-              <img 
-                src="https://i.postimg.cc/sDf8Y5gq/New-Project.png" 
-                alt="Alghasab Dental Clinics" 
-                className="h-12 w-12 rounded-full border-2 border-white shadow-md"
-              />
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10 2C5.58 2 2 5.58 2 10s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm-1-9h2v5h-2zm0 6h2v2h-2z"/>
+                </svg>
+              </div>
               <div>
                 <h1 className="text-2xl font-bold text-white">عيادات الغصاب لطب الأسنان</h1>
                 <p className="text-blue-100 text-sm">Alghasab Dental Clinics</p>
