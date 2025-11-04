@@ -248,6 +248,54 @@ frontend:
           agent: "testing"
           comment: "✅ COMPREHENSIVE TESTING COMPLETED - ALL 7/7 TESTS PASSED: 1) Google Maps Review button is prominently visible at top of Patient Dashboard next to Book Appointment button (lines 213-222). 2) Perfect green gradient styling (from-green-600 to-green-700 hover:from-green-700 hover:to-green-800). 3) Correct Arabic text 'قيّم زيارتك على Google Maps' with star icon. 4) Button opens correct Google Maps URL (https://maps.app.goo.gl/qiCBGYcxLRaPLRN77?g_st=aw) in new tab. 5) Always visible - no need for completed appointments. 6) Proper flex-wrap layout for responsive design. 7) Side-by-side positioning with Book Appointment button. The NEW placement implementation is PERFECT and meets all user requirements for improved visibility and accessibility."
 
+  - task: "Medical Instructions - Before Treatment page"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/BeforeTreatmentInstructions.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "IMPLEMENTED: Created new page '/before-treatment' showing 'What Should You Do Before Starting Dental Treatment' with full QR code image from user's provided screenshot. Page includes: 1) Header with clinic logo and navigation, 2) Prominent title section, 3) Full image display with QR code, 4) Important notice section, 5) Navigation buttons to after-treatment page and home, 6) Footer with social media links. Design matches app's green color scheme."
+
+  - task: "Medical Instructions - After Treatment page"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/AfterTreatmentInstructions.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "IMPLEMENTED: Created new page '/after-treatment' with 10 treatment types. Features: 1) Grid display of all 10 treatments with colorful icons (خلع الأسنان, علاج عصب, حشوات, تبييض, تنظيف, علاج أطفال, تركيبات متحركة, تركيبات ثابتة, تقويم, زراعة), 2) Individual treatment view when clicked showing full QR codes image, 3) All QR codes display section showing complete image with all 10 QR codes, 4) Back navigation to treatment list, 5) Links to before-treatment page. Design uses gradient colors matching each treatment type."
+
+  - task: "Landing Page - Medical Instructions Section"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/LandingPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "IMPLEMENTED: Added prominent 'تعليمات طبية مهمة' section on landing page between hero and features sections. Section has green gradient background with two prominent cards: 1) 'قبل البدء بالعلاج' card with blue icon and button linking to /before-treatment, 2) 'تعليمات ما بعد العلاج' card with green checkmark icon and button linking to /after-treatment. Cards have hover effects and transform animations. Section is highly visible as requested by user for patient awareness before clinic visits."
+
+  - task: "App.js - Routes for Medical Instructions"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "IMPLEMENTED: Added two new routes to App.js: '/before-treatment' route for BeforeTreatmentInstructions component and '/after-treatment' route for AfterTreatmentInstructions component. Both routes are public (no authentication required) allowing all patients to access medical instructions before visiting clinic."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
