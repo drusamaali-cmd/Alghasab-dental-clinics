@@ -111,9 +111,9 @@ const AfterTreatmentInstructions = () => {
       <div className="max-w-7xl mx-auto px-4 py-12">
         {/* Title Section */}
         <div className="text-center mb-12 animate-fade-in">
-          <div className="inline-block bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4 rounded-2xl shadow-lg mb-6">
+          <div className="inline-block bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-2xl shadow-lg mb-6">
             <h2 className="text-3xl font-bold mb-2">تعليمات ما بعد العلاج</h2>
-            <p className="text-green-100 text-lg">Instructions After Treatment</p>
+            <p className="text-blue-100 text-lg">Instructions After Treatment</p>
           </div>
           <p className="text-gray-600 text-lg max-w-3xl mx-auto">
             للحصول على تعليمات مفصلة بعد كل نوع من العلاج، الرجاء اختيار العلاج الخاص بك أدناه ومسح رمز الاستجابة السريعة
