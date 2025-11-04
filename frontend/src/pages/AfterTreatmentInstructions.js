@@ -135,7 +135,7 @@ const AfterTreatmentInstructions = () => {
                   </div>
                   <h3 className="text-xl font-bold text-gray-800 mb-2">{treatment.nameAr}</h3>
                   <p className="text-gray-500 text-sm mb-4">{treatment.nameEn}</p>
-                  <div className="flex items-center justify-end space-x-2 space-x-reverse text-green-600 font-medium">
+                  <div className="flex items-center justify-end space-x-2 space-x-reverse text-blue-600 font-medium">
                     <span>عرض التعليمات</span>
                     <ChevronLeft size={20} />
                   </div>
