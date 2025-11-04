@@ -13,15 +13,11 @@ const LandingPage = () => {
       <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white">
-              <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 2C5.58 2 2 5.58 2 10s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm-1-9h2v5h-2zm0 6h2v2h-2z"/>
-              </svg>
-            </div>
-            <div className="text-right">
-              <h1 className="text-2xl font-bold text-gray-900">عيادات الغصاب</h1>
-              <p className="text-sm text-gray-600">Alghasab Dental Clinics</p>
-            </div>
+            <img 
+              src="https://customer-assets.emergentagent.com/job_dental-booking-16/artifacts/y7wadlfl_Screenshot_20251104_114043_Gallery.jpg" 
+              alt="عيادات الغصاب" 
+              className="h-16 w-auto"
+            />
           </div>
           <div className="flex gap-3">
             <Button 
