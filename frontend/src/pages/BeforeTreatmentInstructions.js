@@ -37,9 +37,9 @@ const BeforeTreatmentInstructions = () => {
       <div className="max-w-4xl mx-auto px-4 py-12">
         {/* Title Section */}
         <div className="text-center mb-8 animate-fade-in">
-          <div className="inline-block bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4 rounded-2xl shadow-lg mb-6">
+          <div className="inline-block bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-2xl shadow-lg mb-6">
             <h2 className="text-3xl font-bold mb-2">ماذا يجب أن تفعل قبل البدء بعلاج الأسنان؟</h2>
-            <p className="text-green-100 text-lg">What Should You Do Before Starting Dental Treatment?</p>
+            <p className="text-blue-100 text-lg">What Should You Do Before Starting Dental Treatment?</p>
           </div>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
             للحصول على تعليمات مفصلة قبل بدء علاج الأسنان، الرجاء مسح رمز الاستجابة السريعة أدناه
