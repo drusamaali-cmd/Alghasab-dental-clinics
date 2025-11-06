@@ -38,51 +38,15 @@ const PatientDashboard = ({ user, onLogout }) => {
   }, []);
 
   const checkNotificationPermission = async () => {
-    // Check if running on native platform
-    if (Capacitor.isNativePlatform()) {
-      try {
-        // Initialize OneSignal for native
-        OneSignal.setAppId(ONESIGNAL_APP_ID);
-        
-        // Set external user ID (phone number)
-        if (user && user.phone) {
-          OneSignal.setExternalUserId(user.phone);
-        }
-        
-        // Prompt for push notifications
-        OneSignal.promptForPushNotificationsWithUserResponse((accepted) => {
-          console.log("User accepted notifications: " + accepted);
-          setNotificationPermission(accepted ? 'granted' : 'denied');
-          setShowNotificationPrompt(!accepted);
-        });
-      } catch (error) {
-        console.log('OneSignal native error:', error);
-      }
-    } else {
-      // For web/browser (PWA)
-      console.log('Running in browser/PWA mode - notifications disabled in this version');
-      setShowNotificationPrompt(false);
-    }
+    // Notifications disabled temporarily for native build
+    console.log('Push notifications will be added in future update');
+    setShowNotificationPrompt(false);
   };
 
   const handleEnableNotifications = async () => {
-    try {
-      if (Capacitor.isNativePlatform()) {
-        // Prompt for push notifications on native
-        OneSignal.promptForPushNotificationsWithUserResponse((accepted) => {
-          if (accepted) {
-            setNotificationPermission('granted');
-            setShowNotificationPrompt(false);
-            toast.success('تم تفعيل الإشعارات بنجاح! 🎉');
-          } else {
-            toast.error('تم رفض الإشعارات');
-          }
-        });
-      }
-    } catch (error) {
-      console.log('Error enabling notifications:', error);
-      toast.error('حدث خطأ أثناء تفعيل الإشعارات');
-    }
+    // Notifications disabled temporarily for native build
+    console.log('Push notifications will be added in future update');
+    toast.info('الإشعارات ستتوفر في التحديث القادم');
   };
 
   const fetchData = async () => {
